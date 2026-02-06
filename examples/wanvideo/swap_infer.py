@@ -281,7 +281,7 @@ if __name__ == "__main__":
 #     --output_dir results/swap_81_vace_flf \
 #     --data_csv data/long_video_swap/swap.csv \
 #     --max_num_frames 81 \
-#     --gpus 0,1,2,3 \
+#     --gpus 4,5,6,7 \
 #     --model_path models/GenHOI_VACE/step-5000-gate_attn.safetensors \
 #     --lora_path models/GenHOI_VACE/step-1100-lora-gate-flf-720-2.safetensors \
 #     --is_fl
