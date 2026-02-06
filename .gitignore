@@ -12,3 +12,4 @@ demo
 tools/eval_fvd/*.pt
 tools/eval_fvd/*.pth
 *.safetensors
+*.log
