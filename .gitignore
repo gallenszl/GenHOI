@@ -7,6 +7,7 @@ models/Wan-AI
 models/ckpt
 models/train
 models/wan_i2v_background.ckpt
+models/GenHOI_VACE
 results
 *.mp4
 *.MP4
