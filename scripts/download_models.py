@@ -22,7 +22,8 @@ from pathlib import Path
 # ============================================
 
 # Hugging Face repository
-HF_REPO_ID = "your-username/GenHOI"  # TODO: Update this
+HF_REPO_ID = "XuanHuang0/GenHOI"  # Model weights
+HF_DATA_REPO_ID = "XuanHuang0/GenHOI-data"  # Demo data and assets
 
 # Google Drive file IDs (extract from sharing links)
 GDRIVE_IDS = {
@@ -85,34 +86,70 @@ def get_project_root():
     return script_dir.parent
 
 
+def download_data_from_huggingface(repo_id, local_dir, patterns=None):
+    """Download files from Hugging Face Hub (dataset repo)."""
+    from huggingface_hub import snapshot_download
+    print(f"\n📥 Downloading from Hugging Face dataset: {repo_id}")
+    print(f"   Target directory: {local_dir}")
+    os.makedirs(local_dir, exist_ok=True)
+    if patterns:
+        for pattern in patterns:
+            print(f"   Downloading pattern: {pattern}")
+            snapshot_download(repo_id=repo_id, repo_type="dataset", local_dir=local_dir, allow_patterns=pattern, local_dir_use_symlinks=False)
+    else:
+        snapshot_download(repo_id=repo_id, repo_type="dataset", local_dir=local_dir, local_dir_use_symlinks=False)
+    print("✅ Download complete!")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Download GenHOI model weights")
     parser.add_argument("--source", type=str, choices=["huggingface", "gdrive"], default="huggingface")
-    parser.add_argument("--models", type=str, choices=["all", "base", "genhoi", "eval", "demo"], default="all")
+    parser.add_argument("--models", type=str, choices=["all", "base", "genhoi", "eval", "demo", "assets"], default="all")
     parser.add_argument("--output-dir", type=str, default=None)
     parser.add_argument("--repo-id", type=str, default=HF_REPO_ID)
+    parser.add_argument("--data-repo-id", type=str, default=HF_DATA_REPO_ID)
     args = parser.parse_args()
     
     check_dependencies()
     output_dir = Path(args.output_dir) if args.output_dir else get_project_root()
     models_dir = output_dir / "models"
     tools_dir = output_dir / "tools" / "eval_fvd"
+    demo_dir = output_dir / "demo"
+    assets_dir = output_dir / "assets"
     
     print("=" * 60)
     print("GenHOI Model Downloader")
     print("=" * 60)
     print(f"Source: {args.source}, Models: {args.models}, Output: {output_dir}")
+    print(f"Model repo: {args.repo_id}")
+    print(f"Data repo: {args.data_repo_id}")
     
     if args.source == "huggingface":
         if args.models == "all":
+            # Download model weights
+            print("\n--- Downloading model weights ---")
             download_from_huggingface(args.repo_id, str(models_dir))
+            # Download demo data
+            print("\n--- Downloading demo data ---")
+            download_data_from_huggingface(args.data_repo_id, str(output_dir), patterns=["demo/*"])
+            # Download assets
+            print("\n--- Downloading assets ---")
+            download_data_from_huggingface(args.data_repo_id, str(output_dir), patterns=["assets/*"])
+            # Download eval models
+            print("\n--- Downloading evaluation models ---")
+            os.makedirs(tools_dir, exist_ok=True)
+            download_data_from_huggingface(args.data_repo_id, str(tools_dir), patterns=["eval_models/*"])
         elif args.models == "base":
-            download_from_huggingface(args.repo_id, str(models_dir), patterns=["Wan2.1-I2V-14B-720P/*"])
+            download_from_huggingface(args.repo_id, str(models_dir), patterns=["Wan-AI/*", "Wan2.1-I2V-14B-720P/*"])
         elif args.models == "genhoi":
             download_from_huggingface(args.repo_id, str(models_dir), patterns=["*.consolidated"])
         elif args.models == "eval":
             os.makedirs(tools_dir, exist_ok=True)
-            download_from_huggingface(args.repo_id, str(tools_dir), patterns=["eval_models/*"])
+            download_data_from_huggingface(args.data_repo_id, str(tools_dir), patterns=["eval_models/*"])
+        elif args.models == "demo":
+            download_data_from_huggingface(args.data_repo_id, str(output_dir), patterns=["demo/*"])
+        elif args.models == "assets":
+            download_data_from_huggingface(args.data_repo_id, str(output_dir), patterns=["assets/*"])
     elif args.source == "gdrive":
         if args.models in ["all", "genhoi"] and GDRIVE_IDS.get("GenHOI_wan_flf.consolidated") != "your-file-id-here":
             download_from_gdrive(GDRIVE_IDS["GenHOI_wan_flf.consolidated"], str(models_dir / "GenHOI_wan_flf.consolidated"))

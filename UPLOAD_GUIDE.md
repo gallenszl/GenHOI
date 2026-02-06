@@ -76,9 +76,9 @@ demo/
 ### Step 1: 创建 Hugging Face 账号和仓库
 
 1. 注册 [Hugging Face](https://huggingface.co/) 账号
-2. 创建新的 Model Repository：
-   - 主仓库名: `your-username/GenHOI`
-   - 可选: 单独的数据仓库 `your-username/GenHOI-demo-data`
+2. 创建新的 Repository：
+   - 模型仓库: `XuanHuang0/GenHOI` (type: model)
+   - 数据仓库: `XuanHuang0/GenHOI-data` (type: dataset)
 
 ### Step 2: 安装 Hugging Face CLI
 
@@ -305,14 +305,23 @@ python scripts/download_from_gdrive.py
 ### Hugging Face
 
 ```
-your-username/GenHOI (Model Repository)
+XuanHuang0/GenHOI (Model Repository)
 ├── README.md (Model Card)
-├── Wan2.1-I2V-14B-720P/
-│   ├── diffusion_pytorch_model-*.safetensors
-│   ├── models_clip_*.pth
-│   ├── models_t5_*.pth
-│   └── Wan2.1_VAE.pth
-├── GenHOI_wan_flf.consolidated
+├── Wan-AI/
+│   └── Wan2.1-I2V-14B-720P/
+│       ├── diffusion_pytorch_model-*.safetensors
+│       ├── models_clip_*.pth
+│       ├── models_t5_*.pth
+│       └── Wan2.1_VAE.pth
+└── GenHOI_wan_flf.consolidated
+
+XuanHuang0/GenHOI-data (Dataset Repository)
+├── demo/
+│   ├── 10/
+│   ├── selfswap/
+│   └── *.csv
+├── assets/
+│   └── teaser.png
 └── eval_models/
     ├── i3d_pretrained_400.pt
     └── resnet-50-kinetics.pth
@@ -321,7 +330,7 @@ your-username/GenHOI (Model Repository)
 ### GitHub
 
 ```
-your-username/GenHOI (Code Repository)
+XuanHuang0/GenHOI (Code Repository)
 ├── README.md
 ├── requirements.txt
 ├── LICENSE
@@ -329,9 +338,9 @@ your-username/GenHOI (Code Repository)
 ├── diffsynth/
 ├── examples/
 ├── tools/
-├── assets/
 └── scripts/
-    └── download_models.py
+    ├── download_models.py
+    └── upload_to_huggingface.sh
 ```
 
 ---

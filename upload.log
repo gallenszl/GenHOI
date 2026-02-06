@@ -1,0 +1,69 @@
+nohup: ignoring input
+[2026-02-06 14:54:54] ==========================================
+[2026-02-06 14:54:54] GenHOI HuggingFace 上传脚本
+[2026-02-06 14:54:54] ==========================================
+[2026-02-06 14:54:54] 数据仓库: XuanHuang0/GenHOI-data
+[2026-02-06 14:54:54] 模型仓库: XuanHuang0/GenHOI
+[2026-02-06 14:54:54] 本地路径: /root/paddlejob/workspace/huangxuan/GenHOI
+[2026-02-06 14:54:54] ==========================================
+[2026-02-06 14:54:54] 检查 HuggingFace 登录状态...
+XuanHuang0
+[2026-02-06 14:54:55] ✅ 已登录 HuggingFace
+[2026-02-06 14:54:55] 初始化 git-lfs...
+Updated git hooks.
+Git LFS initialized.
+[2026-02-06 14:54:55] ✅ git-lfs 已初始化
+[2026-02-06 14:54:55] 创建 HuggingFace 仓库（如果不存在）...
+[90mgit version 2.25.1[0m
+[90mgit-lfs/2.9.2 (GitHub; linux amd64; go 1.13.5)[0m
+
+You are about to create [1mdatasets/XuanHuang0/GenHOI-data[0m
+Proceed? [Y/n] [2026-02-06 14:54:56] 数据仓库已存在
+[90mgit version 2.25.1[0m
+[90mgit-lfs/2.9.2 (GitHub; linux amd64; go 1.13.5)[0m
+
+You are about to create [1mXuanHuang0/GenHOI[0m
+Proceed? [Y/n] [2026-02-06 14:54:58] 模型仓库已存在
+[2026-02-06 14:54:58] ✅ 仓库检查完成
+[2026-02-06 14:54:58] 
+[2026-02-06 14:54:58] ==========================================
+[2026-02-06 14:54:58] 第一部分: 上传到数据仓库 (XuanHuang0/GenHOI-data)
+[2026-02-06 14:54:58] ==========================================
+[2026-02-06 14:54:58] 
+[2026-02-06 14:54:58] --- [1/4] 上传 demo 数据 (~241MB) ---
+[2026-02-06 14:54:58] 上传目录: /root/paddlejob/workspace/huangxuan/GenHOI/demo -> demo
+Consider using `hf_transfer` for faster uploads. This solution comes with some limitations. See https://huggingface.co/docs/huggingface_hub/hf_transfer for more details.
+Start hashing 20 files.
+Finished hashing 20 files.
+video.mp4:   0%|          | 0.00/114M [00:00<?, ?B/s]
+Upload 2 LFS files:   0%|          | 0/2 [00:00<?, ?it/s][A
+
+video_replace.mp4:   0%|          | 0.00/110M [00:00<?, ?B/s][A[Avideo.mp4:   0%|          | 16.4k/114M [00:02<3:56:21, 8.05kB/s]video.mp4:   3%|▎         | 3.60M/114M [00:02<00:47, 2.34MB/s]  video.mp4:   6%|▌         | 7.00M/114M [00:02<00:21, 4.94MB/s]
+
+video_replace.mp4:   0%|          | 16.4k/110M [00:02<4:37:25, 6.59kB/s][A[A
+
+video_replace.mp4:   9%|▉         | 9.88M/110M [00:02<00:18, 5.35MB/s]  [A[Avideo.mp4:   8%|▊         | 9.32M/114M [00:02<00:21, 4.90MB/s]video.mp4:  10%|▉         | 10.9M/114M [00:02<00:17, 5.85MB/s]
+
+video_replace.mp4:  14%|█▍        | 15.4M/110M [00:03<00:13, 7.02MB/s][A[Avideo.mp4:  11%|█         | 12.0M/114M [00:19<00:17, 5.85MB/s]
+
+video_replace.mp4:  14%|█▍        | 15.8M/110M [00:19<00:13, 7.02MB/s][A[Avideo.mp4:  11%|█         | 12.1M/114M [00:46<13:50, 123kB/s] video.mp4:  12%|█▏        | 13.6M/114M [00:47<10:01, 167kB/s]video.mp4:  13%|█▎        | 15.0M/114M [00:48<07:32, 219kB/s]
+
+video_replace.mp4:  14%|█▍        | 15.8M/110M [00:51<08:29, 184kB/s] [A[Avideo.mp4:  14%|█▍        | 16.0M/114M [01:00<07:28, 219kB/s]
+
+video_replace.mp4:  15%|█▍        | 16.0M/110M [01:09<08:28, 184kB/s][A[A
+
+video_replace.mp4:  15%|█▍        | 16.0M/110M [06:00<1:21:19, 19.2kB/s][A[A
+
+video_replace.mp4:  25%|██▌       | 27.9M/110M [06:00<19:48, 68.7kB/s]  [A[A
+
+video_replace.mp4:  29%|██▉       | 32.0M/110M [06:20<18:49, 68.7kB/s][A[A'(MaxRetryError("HTTPSConnectionPool(host='hf-hub-lfs-us-east-1.s3-accelerate.amazonaws.com', port=443): Max retries exceeded with url: /repos/f2/3f/f23fead0975898176970d920e4bdfba210d31a8828cdfdd556cccb1896f6b1bf/7af46fb2138e525d0d5900d19405614af99223d3a7b047ceade83fdadebcf694?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2JU7TKAQLC2QXPN7%2F20260206%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260206T065500Z&X-Amz-Expires=86400&X-Amz-Signature=d341e6e9bed58f94ae578d06a07b0795094fdcec93331f78066e23955cdb051d&X-Amz-SignedHeaders=host&partNumber=2&uploadId=sBD3bHpot1ngWCY0aUzR1zAk5hbb9ScaE1rn37Y9kQAM9GUbdhh8WmRmXQJXCoQzCst79dW7lQvAb72AmUosVbV11aBa_my7VAiMnlVW_jLzu2QbRiy0LvymkX455jCQ&x-id=UploadPart (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"), '(Request ID: 8c2cb9ed-f4a0-471a-9fb0-4c62f3617f5a)')' thrown while requesting PUT https://hf-hub-lfs-us-east-1.s3-accelerate.amazonaws.com/repos/f2/3f/f23fead0975898176970d920e4bdfba210d31a8828cdfdd556cccb1896f6b1bf/7af46fb2138e525d0d5900d19405614af99223d3a7b047ceade83fdadebcf694?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2JU7TKAQLC2QXPN7%2F20260206%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260206T065500Z&X-Amz-Expires=86400&X-Amz-Signature=d341e6e9bed58f94ae578d06a07b0795094fdcec93331f78066e23955cdb051d&X-Amz-SignedHeaders=host&partNumber=2&uploadId=sBD3bHpot1ngWCY0aUzR1zAk5hbb9ScaE1rn37Y9kQAM9GUbdhh8WmRmXQJXCoQzCst79dW7lQvAb72AmUosVbV11aBa_my7VAiMnlVW_jLzu2QbRiy0LvymkX455jCQ&x-id=UploadPart
+Retrying in 1s [Retry 1/5].
+'(MaxRetryError("HTTPSConnectionPool(host='hf-hub-lfs-us-east-1.s3-accelerate.amazonaws.com', port=443): Max retries exceeded with url: /repos/f2/3f/f23fead0975898176970d920e4bdfba210d31a8828cdfdd556cccb1896f6b1bf/7af46fb2138e525d0d5900d19405614af99223d3a7b047ceade83fdadebcf694?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2JU7TKAQLC2QXPN7%2F20260206%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260206T065500Z&X-Amz-Expires=86400&X-Amz-Signature=d341e6e9bed58f94ae578d06a07b0795094fdcec93331f78066e23955cdb051d&X-Amz-SignedHeaders=host&partNumber=2&uploadId=sBD3bHpot1ngWCY0aUzR1zAk5hbb9ScaE1rn37Y9kQAM9GUbdhh8WmRmXQJXCoQzCst79dW7lQvAb72AmUosVbV11aBa_my7VAiMnlVW_jLzu2QbRiy0LvymkX455jCQ&x-id=UploadPart (Caused by SSLError(SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1007)')))"), '(Request ID: f59d26c4-ef3f-4098-8472-d9acc367f3e9)')' thrown while requesting PUT https://hf-hub-lfs-us-east-1.s3-accelerate.amazonaws.com/repos/f2/3f/f23fead0975898176970d920e4bdfba210d31a8828cdfdd556cccb1896f6b1bf/7af46fb2138e525d0d5900d19405614af99223d3a7b047ceade83fdadebcf694?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2JU7TKAQLC2QXPN7%2F20260206%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260206T065500Z&X-Amz-Expires=86400&X-Amz-Signature=d341e6e9bed58f94ae578d06a07b0795094fdcec93331f78066e23955cdb051d&X-Amz-SignedHeaders=host&partNumber=2&uploadId=sBD3bHpot1ngWCY0aUzR1zAk5hbb9ScaE1rn37Y9kQAM9GUbdhh8WmRmXQJXCoQzCst79dW7lQvAb72AmUosVbV11aBa_my7VAiMnlVW_jLzu2QbRiy0LvymkX455jCQ&x-id=UploadPart
+Retrying in 2s [Retry 2/5].
+
+
+video_replace.mp4:  29%|██▉       | 32.0M/110M [07:12<19:51, 65.2kB/s][A[A
+
+video_replace.mp4:  41%|████▏     | 45.4M/110M [07:12<07:24, 145kB/s] [A[A
+
+video_replace.mp4:  44%|████▍     | 48.0M/110M [07:30<07:06, 145kB/s][A[Avideo.mp4:  14%|█▍        | 16.0M/114M [08:05<2:40:22, 10.2kB/s]video.mp4:  18%|█▊        | 20.8M/114M [08:05<1:01:34, 25.3kB/s]video.mp4:  20%|█▉        | 22.4M/114M [08:05<46:58, 32.5kB/s]  video.mp4:  21%|██        | 24.0M/114M [08:05<35:00, 42.9kB/s]video.mp4:  22%|██▏       | 25.1M/114M [08:08<28:56, 51.3kB/s]video.mp4:  23%|██▎       | 25.9M/114M [08:10<24:47, 59.3kB/s]video.mp4:  24%|██▍       | 27.2M/114M [08:12<17:48, 81.3kB/s]video.mp4:  25%|██▌       | 28.6M/114M [08:30<17:31, 81.3kB/s]

@@ -62,13 +62,13 @@ def run_inference(rank, world_size, model_path, output_dir, data_csv, max_num_fr
     # Initialize model manager and load models
     device = torch.device(f'cuda:{rank}')
     model_manager = ModelManager(torch_dtype=torch.bfloat16, device=device)
-    model_manager.load_models(["models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00001-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00002-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00003-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00004-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00005-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00006-of-00007.safetensors,models/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00007-of-00007.safetensors".split(",")])
+    model_manager.load_models(["models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00001-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00002-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00003-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00004-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00005-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00006-of-00007.safetensors,models/Wan-AI/Wan2.1-I2V-14B-720P/diffusion_pytorch_model-00007-of-00007.safetensors".split(",")])
     model_manager.load_models([
-        'models/Wan2.1-I2V-14B-720P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth'
+        'models/Wan-AI/Wan2.1-I2V-14B-720P/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth'
     ], torch_dtype=torch.float32)
     model_manager.load_models([
-        'models/Wan2.1-I2V-14B-720P/models_t5_umt5-xxl-enc-bf16.pth',
-        'models/Wan2.1-I2V-14B-720P/Wan2.1_VAE.pth'
+        'models/Wan-AI/Wan2.1-I2V-14B-720P/models_t5_umt5-xxl-enc-bf16.pth',
+        'models/Wan-AI/Wan2.1-I2V-14B-720P/Wan2.1_VAE.pth'
     ])
 
     # Build pipeline

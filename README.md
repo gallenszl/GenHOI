@@ -14,6 +14,37 @@ GenHOI is a generalizable framework for generating realistic human-object intera
 - **Multi-GPU Inference**: Distributed processing for efficient generation
 - **Fine-grained Control**: Object mask and reference image guided generation
 
+## 🌿 Branch Information
+
+This project contains **two branches** with different base models:
+
+| Branch | Base Model | Description | Environment Reference |
+|--------|------------|-------------|----------------------|
+| **main** | [Wan2.1](https://github.com/Wan-Video/Wan2.1) | GenHOI based on Wan2.1-I2V-14B model | [Wan2.1 Installation](https://github.com/Wan-Video/Wan2.1#installation) |
+| **vace** | [VACE](https://github.com/ali-vilab/VACE) | GenHOI with Video Articulated Condition Embedding | [VACE Installation](https://github.com/ali-vilab/VACE#installation) |
+
+### Switch Branch
+
+```bash
+# Use Wan2.1 based version (default)
+git checkout main
+
+# Use VACE based version
+git checkout vace
+```
+
+### Branch Comparison
+
+| Feature | main (Wan2.1) | vace (VACE) |
+|---------|---------------|-------------|
+| Base Model | Wan2.1-I2V-14B-720P | Wan2.1-VACE-14B |
+| Inference Script | `test_swap.py`, `test_selfswap.py` | `swap_infer.py`, `selfswap_infer.py` |
+| Pipeline Class | `WanVideoPipelineRope` | `WanVideoPipeline` (VACE) |
+| Additional Module | - | `wan_video_vace.py` |
+| Control Enhancement | Standard | VACE-enhanced articulated control |
+
+> **Note**: Please refer to the respective official repositories ([Wan2.1](https://github.com/Wan-Video/Wan2.1) / [VACE](https://github.com/ali-vilab/VACE)) for environment setup and dependencies.
+
 ## 📦 Installation
 
 ### Prerequisites
@@ -26,7 +57,7 @@ GenHOI is a generalizable framework for generating realistic human-object intera
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/GenHOI.git
+git clone https://github.com/XuanHuang0/GenHOI.git
 cd GenHOI
 
 # Create virtual environment (recommended)
@@ -57,12 +88,19 @@ python scripts/download_models.py --source huggingface --models eval    # Evalua
 
 ### Option 2: Manual Download from Hugging Face
 
-Download from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/your-username/GenHOI)
+Download from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/XuanHuang0/GenHOI)
+
+Demo data and assets: 🤗 [Hugging Face - GenHOI-data](https://huggingface.co/datasets/XuanHuang0/GenHOI-data)
 
 ```bash
 # Using huggingface-cli
 pip install huggingface_hub
-huggingface-cli download your-username/GenHOI --local-dir models/
+
+# Download model weights
+huggingface-cli download XuanHuang0/GenHOI --local-dir models/
+
+# Download demo data and assets
+huggingface-cli download XuanHuang0/GenHOI-data --repo-type dataset --local-dir .
 ```
 
 ### Option 3: Manual Download from Google Drive
