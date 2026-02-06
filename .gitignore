@@ -1,0 +1,14 @@
+__pycache__
+models/lightning_logs
+models/Wan-AI
+models/ckpt
+models/Wan2.1-I2V-14B-720P
+models/*.consolidated
+models/*.pth
+models/*.pt
+results
+data
+demo
+tools/eval_fvd/*.pt
+tools/eval_fvd/*.pth
+*.safetensors
