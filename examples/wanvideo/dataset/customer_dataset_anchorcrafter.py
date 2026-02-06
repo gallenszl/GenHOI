@@ -8,6 +8,32 @@ import torchvision.transforms.functional as TF
 import decord
 from PIL import Image
 import json
+from torchvision.transforms.functional import to_pil_image
+
+
+def tensor_to_pil_list(tensor):
+    """
+    Convert a tensor of shape [T, C, H, W] to list of PIL.Image
+    Supports input in ranges:
+        [-1, 1]  -> normalized to [0, 255]
+        [0, 1]   -> scaled to [0, 255]
+        [0, 255] -> converted directly
+    """
+    imgs = []
+    tensor = tensor.detach().cpu()
+
+    for frame in tensor:
+        frame_min, frame_max = frame.min().item(), frame.max().item()
+
+        if frame_min >= -1.0 and frame_max <= 1.0:
+            if frame_min < 0:  # assume [-1, 1]
+                frame = (frame + 1) / 2  # [-1, 1] -> [0, 1]
+            frame = frame * 255.0  # [0, 1] -> [0, 255]
+
+        frame = frame.clamp(0, 255).byte()
+        imgs.append(to_pil_image(frame))
+
+    return imgs
 
 
 def apply_color_augmentation(
@@ -239,7 +265,7 @@ def apply_mask_and_crop(img_path, mask_path):
 
 
 class HumanHoiDataset_anchorcrafter(Dataset):
-    def __init__(self, data_dir="", video_size=768, fps=25, max_num_frames=7, skip_frms_num=3, ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123", data_aug=True, is_random=True, ref_img=None, ref_first_frame=False, is_test=False, is_rehold=True, is_fl=False):
+    def __init__(self, data_dir="", video_size=768, fps=25, max_num_frames=7, skip_frms_num=3, ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123", data_aug=True, is_random=True, ref_img=None, ref_first_frame=False, is_test=False, is_rehold=True, last_frame=False):
         """
         skip_frms_num: ignore the first and the last xx frames, avoiding transitions.
         """
@@ -253,7 +279,6 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         self.random = is_random
         self.is_test = is_test
         self.is_rehold = is_rehold
-        self.is_fl = is_fl
 
         if data_dir is None or data_dir == "":
             video_list_path = "data/training_0801.list"
@@ -278,7 +303,7 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         self.draw_hand_color = draw_hand_color
         self.info_class = info_class
 
-        self.data_root = ""
+        self.data_root = "/root/paddlejob/workspace/huangxuan/AnchorCrafter-400_405f"
         self.caption_path = "prompt/prompt_all_v2.txt"
         self.caption_root = "/root/paddlejob/workspace/huangxuan/bos_data/yqw/processed_human_videos"
         
@@ -290,8 +315,10 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         else:
             print(f"Warning: Caption file not found at {self.caption_path}, caption feature disabled.")
             self.caption = None
+
         self.ref_image = ref_img
         self.ref_first_frame = ref_first_frame
+        self.last_frame = last_frame
         print('ref_id_type:', ref_id_type)
         print("frame_number_list:", frame_number_list)
         print(f"draw_hand_color:{draw_hand_color}")
@@ -316,6 +343,7 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         ref_mask_path = os.path.join(self.data_root, ref_mask_path) + "/01.jpg"
         txt_path = gt_path.replace(".mp4", ".txt")
         prompt_key = gt_path.replace(self.data_root, self.caption_root)
+        
         if self.ref_first_frame:
             prompt = ""
         else:
@@ -423,8 +451,9 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         for i, idx in enumerate(frame_indice):
             if i == 0:
                 continue
-            if self.is_fl and (i % 80 == 0):
-                continue
+            if self.last_frame:
+                if i % 80 == 0:
+                    continue
             try:
                 img_mask = obj_masks[idx].asnumpy()
                 img_mask = np.array(img_mask) / 255
@@ -467,17 +496,14 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         hand_pose = render_frames[:self.max_num_frames, :, :, :]
         hand_obj_box = render_frames[self.max_num_frames:self.max_num_frames * 2, :, :, :]
 
+        pixel_values_ref_img_ori_size = pixel_values_ref_img[0:1]
+
         item = {
-            "gt_frames": gt_frames.contiguous(),
-            "wo_obj_video_frames": wo_obj_video_frames.contiguous(),
-            "pixel_values_ref_img": pixel_values_ref_img[0:1].contiguous(),
-            "hand_pose": hand_pose.contiguous(),
-            "hand_obj_box": hand_obj_box.contiguous(),
-            "pixel_values_ref_img_only_mask": pixel_values_ref_img_only_mask.contiguous(),
-            "num_frames": frame_num,
+            "video": tensor_to_pil_list(gt_frames.contiguous()),
+            "vace_video": tensor_to_pil_list(wo_obj_video_frames.contiguous()),
+            "vace_video_mask": tensor_to_pil_list(pixel_values_ref_img_only_mask.contiguous()),
+            "vace_reference_image": tensor_to_pil_list(pixel_values_ref_img_ori_size.contiguous()),
             "prompt": prompt,
-            "data_path": gt_path,
-            "fps": 25 // sample_rate,
         }
         return item
 

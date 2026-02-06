@@ -2,7 +2,7 @@ import torch
 from .sd3_dit import TimestepEmbeddings, AdaLayerNorm, RMSNorm
 from einops import rearrange
 from .tiler import TileWorker
-from .utils import init_weights_on_device
+from .utils import init_weights_on_device, hash_state_dict_keys
 
 def interact_with_ipadapter(hidden_states, q, ip_k, ip_v, scale=1.0):
     batch_size, num_tokens = hidden_states.shape[0:2]
@@ -276,20 +276,22 @@ class AdaLayerNormContinuous(torch.nn.Module):
 
 
 class FluxDiT(torch.nn.Module):
-    def __init__(self, disable_guidance_embedder=False):
+    def __init__(self, disable_guidance_embedder=False, input_dim=64, num_blocks=19):
         super().__init__()
         self.pos_embedder = RoPEEmbedding(3072, 10000, [16, 56, 56])
         self.time_embedder = TimestepEmbeddings(256, 3072)
         self.guidance_embedder = None if disable_guidance_embedder else TimestepEmbeddings(256, 3072)
         self.pooled_text_embedder = torch.nn.Sequential(torch.nn.Linear(768, 3072), torch.nn.SiLU(), torch.nn.Linear(3072, 3072))
         self.context_embedder = torch.nn.Linear(4096, 3072)
-        self.x_embedder = torch.nn.Linear(64, 3072)
+        self.x_embedder = torch.nn.Linear(input_dim, 3072)
 
-        self.blocks = torch.nn.ModuleList([FluxJointTransformerBlock(3072, 24) for _ in range(19)])
+        self.blocks = torch.nn.ModuleList([FluxJointTransformerBlock(3072, 24) for _ in range(num_blocks)])
         self.single_blocks = torch.nn.ModuleList([FluxSingleTransformerBlock(3072, 24) for _ in range(38)])
 
         self.final_norm_out = AdaLayerNormContinuous(3072)
         self.final_proj_out = torch.nn.Linear(3072, 64)
+        
+        self.input_dim = input_dim
 
 
     def patchify(self, hidden_states):
@@ -373,8 +375,7 @@ class FluxDiT(torch.nn.Module):
         return attention_mask
 
 
-    def process_entity_masks(self, hidden_states, prompt_emb, entity_prompt_emb, entity_masks, text_ids, image_ids):
-        repeat_dim = hidden_states.shape[1]
+    def process_entity_masks(self, hidden_states, prompt_emb, entity_prompt_emb, entity_masks, text_ids, image_ids, repeat_dim):
         max_masks = 0
         attention_mask = None
         prompt_embs = [prompt_emb]
@@ -660,6 +661,9 @@ class FluxDiTStateDictConverter:
         return state_dict_
 
     def from_civitai(self, state_dict):
+        if hash_state_dict_keys(state_dict, with_shape=True) in ["3e6c61b0f9471135fc9c6d6a98e98b6d", "63c969fd37cce769a90aa781fbff5f81"]:
+            dit_state_dict = {key.replace("pipe.dit.", ""): value for key, value in state_dict.items() if key.startswith('pipe.dit.')}
+            return dit_state_dict
         rename_dict = {
             "time_in.in_layer.bias": "time_embedder.timestep_embedder.0.bias",
             "time_in.in_layer.weight": "time_embedder.timestep_embedder.0.weight",
@@ -738,5 +742,7 @@ class FluxDiTStateDictConverter:
                 pass
         if "guidance_embedder.timestep_embedder.0.weight" not in state_dict_:
             return state_dict_, {"disable_guidance_embedder": True}
+        elif "blocks.8.attn.norm_k_a.weight" not in state_dict_:
+            return state_dict_, {"input_dim": 196, "num_blocks": 8}
         else:
             return state_dict_

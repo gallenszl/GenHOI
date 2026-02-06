@@ -178,7 +178,6 @@ class ModelDetectorFromSingleFile:
             state_dict = load_state_dict(file_path)
 
         # Load models with strict matching
-        # import pdb; pdb.set_trace()
         keys_hash_with_shape = hash_state_dict_keys(state_dict, with_shape=True)
         if keys_hash_with_shape in self.keys_hash_with_shape_dict:
             model_names, model_classes, model_resource = self.keys_hash_with_shape_dict[keys_hash_with_shape]
@@ -377,6 +376,7 @@ class ModelManager:
                 self.load_lora(file_path_, state_dict=state_dict, lora_alpha=lora_alpha)
         else:
             print(f"Loading LoRA models from file: {file_path}")
+            is_loaded = False
             if len(state_dict) == 0:
                 state_dict = load_state_dict(file_path)
             for model_name, model, model_path in zip(self.model_name, self.model, self.model_path):
@@ -386,7 +386,10 @@ class ModelManager:
                         print(f"    Adding LoRA to {model_name} ({model_path}).")
                         lora_prefix, model_resource = match_results
                         lora.load(model, state_dict, lora_prefix, alpha=lora_alpha, model_resource=model_resource)
+                        is_loaded = True
                         break
+            if not is_loaded:
+                print(f"    Cannot load LoRA: {file_path}")
 
 
     def load_model(self, file_path, model_names=None, device=None, torch_dtype=None):
@@ -401,15 +404,7 @@ class ModelManager:
             state_dict = load_state_dict(file_path)
         else:
             state_dict = None
-        
-        if state_dict is not None:
-            state_dict_new = {}
-            for k, v in state_dict.items():
-                state_dict_new[k.replace('pipe.dit.','')] = v
-
-            state_dict = state_dict_new
         for model_detector in self.model_detector:
-            # import pdb; pdb.set_trace()
             if model_detector.match(file_path, state_dict):
                 model_names, models = model_detector.load(
                     file_path, state_dict,
@@ -431,7 +426,7 @@ class ModelManager:
             self.load_model(file_path, model_names, device=device, torch_dtype=torch_dtype)
 
     
-    def fetch_model(self, model_name, file_path=None, require_model_path=False):
+    def fetch_model(self, model_name, file_path=None, require_model_path=False, index=None):
         fetched_models = []
         fetched_model_paths = []
         for model, model_path, model_name_ in zip(self.model, self.model_path, self.model_name):
@@ -445,12 +440,25 @@ class ModelManager:
             return None
         if len(fetched_models) == 1:
             print(f"Using {model_name} from {fetched_model_paths[0]}.")
+            model = fetched_models[0]
+            path = fetched_model_paths[0]
         else:
-            print(f"More than one {model_name} models are loaded in model manager: {fetched_model_paths}. Using {model_name} from {fetched_model_paths[0]}.")
+            if index is None:
+                model = fetched_models[0]
+                path = fetched_model_paths[0]
+                print(f"More than one {model_name} models are loaded in model manager: {fetched_model_paths}. Using {model_name} from {fetched_model_paths[0]}.")
+            elif isinstance(index, int):
+                model = fetched_models[:index]
+                path = fetched_model_paths[:index]
+                print(f"More than one {model_name} models are loaded in model manager: {fetched_model_paths}. Using {model_name} from {fetched_model_paths[:index]}.")
+            else:
+                model = fetched_models
+                path = fetched_model_paths
+                print(f"More than one {model_name} models are loaded in model manager: {fetched_model_paths}. Using {model_name} from {fetched_model_paths}.")
         if require_model_path:
-            return fetched_models[0], fetched_model_paths[0]
+            return model, path
         else:
-            return fetched_models[0]
+            return model
         
 
     def to(self, device):

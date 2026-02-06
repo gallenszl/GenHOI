@@ -1,119 +1,42 @@
 import os
 import sys
-import math
 import random
-import json
-import csv
-import traceback
-
 import numpy as np
 import torch
 import torch.nn.functional as F
-import cv2
 import decord
-from decord import VideoReader, cpu
+from decord import VideoReader
 from torch.utils.data import Dataset
+import json
 from PIL import Image
+import traceback
+import csv
+from torchvision.transforms.functional import to_pil_image
 
 
-def extract_bboxes_and_visualize(input_path, obj_mask_path, frame_indices,
-                                 save_dir="vis_bbox", visualize=True):
+def tensor_to_pil_list(tensor):
     """
-    从视频掩码中提取每帧 bounding box，可选是否进行可视化。
-
-    Args:
-        input_path (str): 原视频路径
-        obj_mask_path (str): 掩码视频路径
-        frame_indices (list[int]): 要处理的帧索引
-        save_dir (str): 可视化输出目录（仅在 visualize=True 时使用）
-        visualize (bool): 是否绘制并保存可视化结果
-
-    Returns:
-        bboxes (list[tuple]): 每帧的 bbox 坐标 (x_min, y_min, x_max, y_max) 或 None
-        video_out (str or None): 可视化视频路径（若 visualize=False 则为 None）
+    Convert a tensor of shape [T, C, H, W] to list of PIL.Image
+    Supports input in ranges:
+        [-1, 1]  -> normalized to [0, 255]
+        [0, 1]   -> scaled to [0, 255]
+        [0, 255] -> converted directly
     """
-    os.makedirs(save_dir, exist_ok=True) if visualize else None
+    imgs = []
+    tensor = tensor.detach().cpu()
 
-    # === 读取视频帧 ===
-    video = VideoReader(input_path, ctx=cpu(0))
-    video_frames = video.get_batch(frame_indices).asnumpy()  # (N, H, W, C)
-    N, H, W, C = video_frames.shape
+    for frame in tensor:
+        frame_min, frame_max = frame.min().item(), frame.max().item()
 
-    # === 读取掩码帧 ===
-    mask_reader = VideoReader(obj_mask_path, ctx=cpu(0))
-    mask_frames = mask_reader.get_batch(frame_indices).asnumpy()  # (N, H, W, C)
+        if frame_min >= -1.0 and frame_max <= 1.0:
+            if frame_min < 0:  # assume [-1, 1]
+                frame = (frame + 1) / 2  # [-1, 1] -> [0, 1]
+            frame = frame * 255.0  # [0, 1] -> [0, 255]
 
-    # === 转为Tensor并生成mask ===
-    mask_tensor = torch.from_numpy(mask_frames).permute(0, 3, 1, 2)  # (N, C, H, W)
-    mask = (mask_tensor[:, 0] >= 10) & (mask_tensor[:, 1] >= 10) & (mask_tensor[:, 2] >= 10)  # (N, H, W)
+        frame = frame.clamp(0, 255).byte()
+        imgs.append(to_pil_image(frame))
 
-    bboxes = []
-    vis_frames = [] if visualize else None
-
-    for i in range(N):
-        frame = video_frames[i].copy()
-        mask_2d = mask[i]
-
-        ys, xs = torch.where(mask_2d)
-        if len(xs) > 0 and len(ys) > 0:
-            x_min, x_max = xs.min().item(), xs.max().item()
-            y_min, y_max = ys.min().item(), ys.max().item()
-            bbox = (x_min, y_min, x_max, y_max)
-        else:
-            bbox = None
-
-        bboxes.append(bbox)
-
-        # === 可视化 ===
-        if visualize:
-            if bbox is not None:
-                cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
-                cv2.putText(frame, f"Frame {i}", (x_min, max(0, y_min - 5)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 1)
-            cv2.imwrite(os.path.join(save_dir, f"frame_{i:04d}.png"), frame)
-            vis_frames.append(frame)
-
-    print(f"[INFO] Extracted {len(bboxes)} frame bboxes.")
-
-    # === 导出视频可视化 ===
-    video_out = None
-    if visualize and len(vis_frames) > 0:
-        out_video_path = os.path.join(save_dir, "bbox_preview.mp4")
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        out = cv2.VideoWriter(out_video_path, fourcc, 25, (W, H))
-        for f in vis_frames:
-            out.write(cv2.cvtColor(f, cv2.COLOR_RGB2BGR))
-        out.release()
-        video_out = out_video_path
-        print(f"[INFO] Video preview saved to {video_out}")
-
-    return bboxes, video_out
-
-
-def get_frame_range(vr, frames, sample_rate=1, start_end=None, begin_at_first_frame=False):
-    max_range = len(vr)
-    min_range = 0
-
-    frame_start = 0
-        
-    if begin_at_first_frame:
-        frame_number_start = 0
-    else:
-        frame_number_start = random.randint(min_range, frame_start)
-    frame_range = range(frame_number_start, max_range, sample_rate)
-    frame_range_indices = list(frame_range)[:frames]
-    return frame_range_indices
-
-
-def get_all_resolution(image_size):
-    all_resolution = []
-    divided_by = 32
-    min_edge = int(image_size / 1.4)
-    max_edge = int(image_size * 1.4)
-    token_number = image_size * image_size / divided_by / divided_by
-    for i in range(min_edge // divided_by, max_edge // divided_by + 1):
-        all_resolution.append([i * divided_by, int(token_number // i * divided_by)])
-    return all_resolution
+    return imgs
 
 
 def resize_with_padding(input_tensor, target_h, target_w, additional_pixels=0):
@@ -163,6 +86,32 @@ def resize_with_padding(input_tensor, target_h, target_w, additional_pixels=0):
     return padded
 
 
+def get_frame_range(vr, frames, sample_rate=1, start_end=None, begin_at_first_frame=False):
+    max_range = len(vr)
+    min_range = 0
+
+    frame_start = 0
+        
+    if begin_at_first_frame:
+        frame_number_start = 0
+    else:
+        frame_number_start = random.randint(min_range, frame_start)
+    frame_range = range(frame_number_start, max_range, sample_rate)
+    frame_range_indices = list(frame_range)[:frames]
+    return frame_range_indices
+
+
+def get_all_resolution(image_size):
+    all_resolution = []
+    divided_by = 32
+    min_edge = int(image_size / 1.4)
+    max_edge = int(image_size * 1.4)
+    token_number = image_size * image_size / divided_by / divided_by
+    for i in range(min_edge // divided_by, max_edge // divided_by + 1):
+        all_resolution.append([i * divided_by, int(token_number // i * divided_by)])
+    return all_resolution
+
+
 def random_crop_videos_multi_res(
     video_frames: torch.Tensor,
     render_frames: torch.Tensor = None,
@@ -172,8 +121,9 @@ def random_crop_videos_multi_res(
     pad_px: int = 0
 ):
     """
-    与原版一致地随机裁剪 -> 缩放到 target_size。
+    随机裁剪 -> 缩放到 target_size
     """
+    import math
     F_, C, H, W = video_frames.shape
     th, tw = target_size
     target_ratio = th / float(tw)
@@ -286,10 +236,11 @@ def center_crop_videos_multi_res(video_frames, render_frames=None, target_size=N
 
 
 class HumanHoiDataset_inference(Dataset):
-    def __init__(self, data_dir="", video_size=768, fps=25, max_num_frames=7, skip_frms_num=3,
-                 ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123",
-                 data_aug=True, is_random=True, ref_img=None, ref_first_frame=False,
-                 is_test=False, is_stage1=False, scale=1.25, is_fl=False, ref_in_bbox=True, ref_bg=128):
+    def __init__(self, data_dir="", video_size=None, fps=25, max_num_frames=None, skip_frms_num=3,
+                 ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123", 
+                 data_aug=True, is_random=True, ref_img=None, ref_first_frame=False, 
+                 is_test=False, is_stage1=False, scale=1.25, is_fl=False, ref_in_bbox=True, 
+                 ref_bg=128, data_root=None, ref_first_bbox=False, ref_first_img=False):
         """
         skip_frms_num: ignore the first and the last xx frames, avoiding transitions.
         """
@@ -306,12 +257,15 @@ class HumanHoiDataset_inference(Dataset):
         self.scale = scale
         self.is_fl = is_fl
         self.ref_bg = ref_bg
+        self.ref_first_bbox = ref_first_bbox
+        self.ref_first_img = ref_first_img
 
         if data_dir is None or data_dir == "":
             video_list_path = "data/training_0801.list"
         else:
             video_list_path = data_dir
 
+        ### load video list
         with open(video_list_path, 'r') as csvfile:
             self.videos_list = list(csv.DictReader(csvfile))
             if not self.is_test:
@@ -331,20 +285,27 @@ class HumanHoiDataset_inference(Dataset):
         self.info_class = info_class
 
         self.data_root = ""
-        self.caption_path = "prompt/prompt_all_v2.txt"
+        if data_root is not None:
+            self.data_root = data_root
+        self.caption_path = "/root/paddlejob/workspace/huangxuan/DiffSynth-Studio-New/prompt/prompt_all_v2.txt"
         self.caption_root = "/home/vis/bosdata/yqw/processed_human_videos"
+        
+        # 检测 caption 文件是否存在
         if os.path.exists(self.caption_path):
             with open(self.caption_path, 'r', encoding='utf-8') as file:
                 content = file.read()
             self.caption = json.loads(content)
         else:
-            self.caption = {}
+            print(f"Warning: Caption file not found at {self.caption_path}, caption feature disabled.")
+            self.caption = None
+
         self.ref_image = ref_img
         self.ref_first_frame = ref_first_frame
         self.ref_in_bbox = ref_in_bbox
         print('ref_id_type:', ref_id_type)
         print("frame_number_list:", frame_number_list)
         print(f"draw_hand_color:{draw_hand_color}")
+
 
     def __getitem__(self, index):
         while True:
@@ -368,13 +329,14 @@ class HumanHoiDataset_inference(Dataset):
             input_path = os.path.join(self.data_root, input_path)
             txt_path = gt_path.replace(".mp4", ".txt")
             prompt_key = gt_path.replace(self.data_root, self.caption_root)
+            
             if self.ref_first_frame:
                 prompt = ""
             else:
-                if prompt_key in self.caption:
+                if self.caption is not None and prompt_key in self.caption:
                     prompt = self.caption[prompt_key]
                 else:
-                    prompt = ""
+                    prompt = "" 
             if random.random() < 0.5:
                 prompt = ""
 
@@ -385,13 +347,16 @@ class HumanHoiDataset_inference(Dataset):
             
             size_index = np.random.choice(range(len(self.image_size_list)), p=self.probs)
             resolution_list = get_all_resolution(self.image_size_list[size_index])
-            frame_num = self.max_num_frames
-            cur_resolution = self.video_size
+            if self.max_num_frames is None:
+                frame_num = len(video)
+            else:
+                frame_num = self.max_num_frames
             sample_rate = 1
 
-            frame_indice = get_frame_range(video, frames=frame_num, sample_rate=sample_rate,
+            ## motion frames + gt frames
+            frame_indice = get_frame_range(video, frames=frame_num, sample_rate=sample_rate, 
                                            start_end=start_end, begin_at_first_frame=self.ref_first_frame)
-
+            
             if len(frame_indice) != frame_num:
                 if self.is_test:
                     print(f'{gt_path} not enough frames, but we use {len(frame_indice)} anyway.')
@@ -402,6 +367,10 @@ class HumanHoiDataset_inference(Dataset):
             video_frames = video.get_batch(frame_indice).asnumpy()
             H, W = video_frames.shape[1], video_frames.shape[2]
             width, height = W, H
+            if self.video_size is None:
+                cur_resolution = [H, W]
+            else:
+                cur_resolution = self.video_size
             video_frames = torch.permute(torch.tensor(np.array(video_frames)), (0, 3, 1, 2))
 
             wo_obj_video_frames = decord.VideoReader(input_path)
@@ -412,11 +381,10 @@ class HumanHoiDataset_inference(Dataset):
             pixel_values_ref_img_only_mask = obj_mask.get_batch(frame_indice).asnumpy()
             pixel_values_ref_img_only_mask = torch.permute(torch.tensor(np.array(pixel_values_ref_img_only_mask)), (0, 3, 1, 2))
 
-            frame_indices = list(range(0, 81))
-            bboxes, video_out = extract_bboxes_and_visualize(input_path, obj_mask_path, frame_indices, visualize=False)
+            first_mask_for_bbox = pixel_values_ref_img_only_mask[1, 0].clone()
 
             if self.is_fl:
-                for i in range(0, self.max_num_frames, 80):
+                for i in range(0, frame_num, 80):
                     pixel_values_ref_img_only_mask[i] = 0
             else:
                 pixel_values_ref_img_only_mask[0] = 0
@@ -429,35 +397,67 @@ class HumanHoiDataset_inference(Dataset):
                 wo_obj_video_frames[:, 1][mask] = 128
                 wo_obj_video_frames[:, 2][mask] = 128
 
+            ## ref frame generation
             img_path = data_dict['ref_img']
             img_path = os.path.join(self.data_root, img_path)
             img = Image.open(img_path).convert('RGB')
             ref_img = np.array(img)
-
             pixel_values_ref_img_o = torch.permute(torch.tensor(ref_img), (2, 0, 1)).unsqueeze(0)
 
-            pixel_values_ref_img = resize_with_padding(pixel_values_ref_img_o,
-                                                       target_h=video_frames.shape[2],
-                                                       target_w=video_frames.shape[3])
+            pixel_values_ref_img = resize_with_padding(pixel_values_ref_img_o, target_h=video_frames.shape[2], target_w=video_frames.shape[3])
             pixel_values_ref_img_ori_size = pixel_values_ref_img
 
+            # ref_first_bbox: 从第一帧提取放大区域
+            if self.ref_first_bbox:
+                ys, xs = torch.where(first_mask_for_bbox > 128)
+                if ys.numel() > 0 and xs.numel() > 0:
+                    top, bottom = int(ys.min().item()), int(ys.max().item()) + 1
+                    left, right = int(xs.min().item()), int(xs.max().item()) + 1
+
+                    patch = wo_obj_video_frames[0:1, :, top:bottom, left:right]
+                    H_, W_ = wo_obj_video_frames.shape[-2], wo_obj_video_frames.shape[-1]
+                    _, C, h, w = patch.shape
+                    scale = min(H_ / h, W_ / w)
+
+                    new_h = max(int(h * scale), 1)
+                    new_w = max(int(w * scale), 1)
+
+                    patch_resized = torch.nn.functional.interpolate(
+                        patch, size=(new_h, new_w), mode="bilinear", align_corners=False
+                    )
+
+                    patch_full = torch.full_like(wo_obj_video_frames[0:1], fill_value=self.ref_bg)
+                    top_pad = (H_ - new_h) // 2
+                    left_pad = (W_ - new_w) // 2
+                    patch_full[:, :, top_pad:top_pad+new_h, left_pad:left_pad+new_w] = patch_resized
+
+                    pixel_values_ref_img_ori_size = torch.cat(
+                        [pixel_values_ref_img_ori_size, patch_full], dim=0
+                    )
+
+            # 处理黑色和白色像素
             mask_black = (pixel_values_ref_img_o[:, 0] == 0) & \
-                         (pixel_values_ref_img_o[:, 1] == 0) & \
-                         (pixel_values_ref_img_o[:, 2] == 0)
+                        (pixel_values_ref_img_o[:, 1] == 0) & \
+                        (pixel_values_ref_img_o[:, 2] == 0)
 
             mask_white = (pixel_values_ref_img_o[:, 0] == 255) & \
-                         (pixel_values_ref_img_o[:, 1] == 255) & \
-                         (pixel_values_ref_img_o[:, 2] == 255)
+                        (pixel_values_ref_img_o[:, 1] == 255) & \
+                        (pixel_values_ref_img_o[:, 2] == 255)
 
             mask = mask_black | mask_white
             pixel_values_ref_img_o[:, 0][mask] = 128
             pixel_values_ref_img_o[:, 1][mask] = 128
             pixel_values_ref_img_o[:, 2][mask] = 128
 
-            mask = (pixel_values_ref_img_ori_size[:, 0] == 0) & \
-                   (pixel_values_ref_img_ori_size[:, 1] == 0) & \
-                   (pixel_values_ref_img_ori_size[:, 2] == 0)
+            mask_black = (pixel_values_ref_img_ori_size[:, 0] == 0) & \
+                        (pixel_values_ref_img_ori_size[:, 1] == 0) & \
+                        (pixel_values_ref_img_ori_size[:, 2] == 0)
 
+            mask_white = (pixel_values_ref_img_ori_size[:, 0] == 255) & \
+                        (pixel_values_ref_img_ori_size[:, 1] == 255) & \
+                        (pixel_values_ref_img_ori_size[:, 2] == 255)
+
+            mask = mask_black | mask_white
             pixel_values_ref_img_ori_size[:, 0][mask] = self.ref_bg
             pixel_values_ref_img_ori_size[:, 1][mask] = self.ref_bg
             pixel_values_ref_img_ori_size[:, 2][mask] = self.ref_bg
@@ -501,41 +501,35 @@ class HumanHoiDataset_inference(Dataset):
                     img_h, img_w = wo_obj_video_frames.shape[-2], wo_obj_video_frames.shape[-1]
                     center_h = min(max(center_h, half), img_h - half)
                     center_w = min(max(center_w, half), img_w - half)
-                    pixel_values_ref_img_mask = resize_with_padding(pixel_values_ref_img_o,
-                                                                    target_h=mask_size,
-                                                                    target_w=mask_size)
-                    wo_obj_video_frames[i, :, center_h-(mask_size//2):center_h+(mask_size//2),
-                                        center_w-(mask_size//2):center_w+(mask_size//2)] = pixel_values_ref_img_mask
-                    pixel_values_ref_img_only_mask[i, :, center_h-(mask_size//2):center_h+(mask_size//2),
-                                                   center_w-(mask_size//2):center_w+(mask_size//2)] = 255
+                    pixel_values_ref_img_mask = resize_with_padding(pixel_values_ref_img_o, target_h=mask_size, target_w=mask_size)
+                    wo_obj_video_frames[i, :, center_h-(mask_size//2):center_h+(mask_size//2), center_w-(mask_size//2):center_w+(mask_size//2)] = pixel_values_ref_img_mask
+                    pixel_values_ref_img_only_mask[i, :, center_h-(mask_size//2):center_h+(mask_size//2), center_w-(mask_size//2):center_w+(mask_size//2)] = 255
 
-            video_frames = torch.cat([video_frames, wo_obj_video_frames,
-                                      pixel_values_ref_img_only_mask, pixel_values_ref_img_ori_size], dim=0)
+            video_frames = torch.cat([video_frames, wo_obj_video_frames, pixel_values_ref_img_only_mask, pixel_values_ref_img_ori_size], dim=0)
             render_frames = None
             if self.is_test:
                 video_frames, render_frames = center_crop_videos_multi_res(video_frames, render_frames, cur_resolution)
-            else:
+            else:    
                 video_frames, render_frames = random_crop_videos_multi_res(video_frames, render_frames, cur_resolution)
 
             gt_frames = video_frames[:tmp_single_num, :, :, :]
             wo_obj_video_frames = video_frames[tmp_single_num:tmp_single_num * 2, :, :, :]
             pixel_values_ref_img_only_mask = video_frames[tmp_single_num * 2:tmp_single_num * 3, :, :, :]
             pixel_values_ref_img_ori_size = video_frames[tmp_single_num * 3:, :, :, :]
-            hand_pose = gt_frames
-            hand_obj_box = gt_frames
+
+            if self.ref_first_img:
+                pixel_values_ref_img_ori_size = torch.cat(
+                    [wo_obj_video_frames[0:1], pixel_values_ref_img_ori_size], dim=0
+                )
 
             item = {
-                "gt_frames": gt_frames.contiguous(),
-                "wo_obj_video_frames": wo_obj_video_frames.contiguous(),
-                "pixel_values_ref_img": pixel_values_ref_img_ori_size.contiguous(),
-                "hand_pose": hand_pose.contiguous(),
-                "hand_obj_box": hand_obj_box.contiguous(),
-                "pixel_values_ref_img_only_mask": pixel_values_ref_img_only_mask.contiguous(),
-                "num_frames": frame_num,
+                "video": tensor_to_pil_list(gt_frames.contiguous()),
+                "vace_video": tensor_to_pil_list(wo_obj_video_frames.contiguous()),
+                "vace_video_mask": tensor_to_pil_list(pixel_values_ref_img_only_mask.contiguous()),
+                "vace_reference_image": tensor_to_pil_list(pixel_values_ref_img_ori_size.contiguous()),
                 "prompt": prompt,
-                "fps": 25 // sample_rate,
-                "bboxes": bboxes
             }
+            
             return item
 
     def __len__(self):

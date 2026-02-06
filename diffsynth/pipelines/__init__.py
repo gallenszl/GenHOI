@@ -11,6 +11,5 @@ from .omnigen_image import OmnigenImagePipeline
 from .pipeline_runner import SDVideoPipelineRunner
 from .hunyuan_video import HunyuanVideoPipeline
 from .step_video import StepVideoPipeline
-from .wan_video_v2v import WanVideoPipeline
-from .wan_video_v2v_rope import WanVideoPipeline as WanVideoPipelineRope
+from .wan_video import WanVideoPipeline
 KolorsImagePipeline = SDXLImagePipeline
