@@ -253,9 +253,9 @@ if __name__ == "__main__":
                         help="Maximum number of frames to process")
     parser.add_argument('--is_fl', action='store_true', default=False,
                         help="Enable first-last frame mode")
-    parser.add_argument('--model_path', type=str, default="models/train/step-5000-gate_attn.safetensors",
+    parser.add_argument('--model_path', type=str, default="models/GenHOI_VACE/step-5000-gate_attn.safetensors",
                         help="Path to the model state dict weights")
-    parser.add_argument('--lora_path', type=str, default="models/train/step-1700-lora-gate-720.safetensors",
+    parser.add_argument('--lora_path', type=str, default="models/GenHOI_VACE/step-1700-lora-gate-720.safetensors",
                         help="Path to the LoRA model weights")
     args = parser.parse_args()
 
@@ -279,9 +279,9 @@ if __name__ == "__main__":
 
 # python examples/wanvideo/swap_infer.py \
 #     --output_dir results/swap_81_vace_flf \
-#     --data_csv demo/demo.csv \
+#     --data_csv data/long_video_swap/swap.csv \
 #     --max_num_frames 81 \
-#     --gpus 1 \
-#     --model_path models/train/step-5000-gate_attn.safetensors \
-#     --lora_path models/train/step-1100-lora-gate-flf-720-2.safetensors \
+#     --gpus 0,1,2,3 \
+#     --model_path models/GenHOI_VACE/step-5000-gate_attn.safetensors \
+#     --lora_path models/GenHOI_VACE/step-1100-lora-gate-flf-720-2.safetensors \
 #     --is_fl

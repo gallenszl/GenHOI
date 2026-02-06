@@ -1,5 +1,4 @@
 __pycache__
-anchorcrafter_swap
 data
 demo
 eval_fvd
@@ -8,6 +7,7 @@ models/Wan-AI
 models/ckpt
 models/train
 models/wan_i2v_background.ckpt
+results
 *.mp4
 *.MP4
 *.tar
