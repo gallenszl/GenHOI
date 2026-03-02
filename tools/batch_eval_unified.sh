@@ -76,7 +76,7 @@ copy_and_rename() {
     local suffix=$2
     local count=0
     
-    for src in $(ls "$base_dir"/sample_*_allclips/${pattern} 2>/dev/null | head -n ${MAX_SAMPLES:-999999}); do
+    for src in $(ls "$base_dir"/sample_*_allclips/${pattern} 2>/dev/null | if [ "$MAX_SAMPLES" -gt 0 ]; then head -n $MAX_SAMPLES; else cat; fi); do
         if [ -f "$src" ]; then
             base=$(basename "$(dirname "$src")")
             prefix=${base%_allclips}

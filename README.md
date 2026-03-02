@@ -1,18 +1,18 @@
-# GenHOI: Generalizable Human-Object Interaction Video Generation
+# GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection
 
 <p align="center">
   <img src="assets/teaser.png" width="90%">
 </p>
 
-GenHOI is a generalizable framework for generating realistic human-object interaction videos. Built upon the Wan2.1 video generation model and DiffSynth-Studio, GenHOI enables flexible object swapping and HOI video synthesis with fine-grained control.
+This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/abs/2508.01488).
 
-## ✨ Features
+<!-- ## ✨ Features
 
 - **Generalizable Object Swapping**: Replace objects in videos while maintaining natural hand-object interactions
 - **High-Quality Video Generation**: Based on Wan2.1-I2V-14B model for photorealistic results
 - **Flexible Frame Control**: Support for variable frame lengths (up to 400+ frames)
 - **Multi-GPU Inference**: Distributed processing for efficient generation
-- **Fine-grained Control**: Object mask and reference image guided generation
+- **Fine-grained Control**: Object mask and reference image guided generation -->
 
 ## 🌿 Branch Information
 
@@ -21,7 +21,7 @@ This project contains **two branches** with different base models:
 | Branch | Base Model | Description | Environment Reference |
 |--------|------------|-------------|----------------------|
 | **main** | [Wan2.1](https://github.com/Wan-Video/Wan2.1) | GenHOI based on Wan2.1-I2V-14B model | [Wan2.1 Installation](https://github.com/Wan-Video/Wan2.1#installation) |
-| **vace** | [VACE](https://github.com/ali-vilab/VACE) | GenHOI with Video Articulated Condition Embedding | [VACE Installation](https://github.com/ali-vilab/VACE#installation) |
+| **vace** | [VACE](https://github.com/ali-vilab/VACE) | GenHOI based on vace model| [VACE Installation](https://github.com/ali-vilab/VACE#installation) |
 
 ### Switch Branch
 
@@ -33,7 +33,8 @@ git checkout main
 git checkout vace
 ```
 
-### Branch Comparison
+Below, we introduce how to start the Wan-based GenHOI. For instructions on the VACE-based GenHOI, please refer to the README file in the corresponding branch.
+<!-- ### Branch Comparison
 
 | Feature | main (Wan2.1) | vace (VACE) |
 |---------|---------------|-------------|
@@ -43,69 +44,22 @@ git checkout vace
 | Additional Module | - | `wan_video_vace.py` |
 | Control Enhancement | Standard | VACE-enhanced articulated control |
 
-> **Note**: Please refer to the respective official repositories ([Wan2.1](https://github.com/Wan-Video/Wan2.1) / [VACE](https://github.com/ali-vilab/VACE)) for environment setup and dependencies.
+> **Note**: Please refer to the respective official repositories ([Wan2.1](https://github.com/Wan-Video/Wan2.1) / [VACE](https://github.com/ali-vilab/VACE)) for environment setup and dependencies. -->
 
-## 📦 Installation
+## 📦 Environment Installation
+We recommend follo
+w the environment setting of  [Wan2.1](https://github.com/Wan-Video/Wan2.1) to install the environment dependencies.
 
-### Prerequisites
-
-- Python >= 3.8
-- CUDA >= 12.x
-- PyTorch >= 2.0
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/XuanHuang0/GenHOI.git
-cd GenHOI
-
-# Create virtual environment (recommended)
-conda create -n genhoi python=3.10 -y
-conda activate genhoi
-
-# Install dependencies
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-pip install -r requirements.txt
-```
 
 ## 📂 Model Weights
 
-### Option 1: Download with Script (Recommended)
-
-```bash
-# Install dependencies
-pip install huggingface_hub gdown
-
-# Download all models from Hugging Face
-python scripts/download_models.py --source huggingface
-
-# Or download specific components
-python scripts/download_models.py --source huggingface --models base    # Wan2.1 base model only
-python scripts/download_models.py --source huggingface --models genhoi  # GenHOI weights only
-python scripts/download_models.py --source huggingface --models eval    # Evaluation models only
-```
-
 ### Option 2: Manual Download from Hugging Face
 
-Download from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/XuanHuang0/GenHOI)
+Download model from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)
 
-Demo data and assets: 🤗 [Hugging Face - GenHOI-data](https://huggingface.co/datasets/XuanHuang0/GenHOI-data)
+Demo data and assets: 🤗 [Hugging Face - GenHOI-data](https://huggingface.co/datasets/szlgallen/GenHOI)
 
-```bash
-# Using huggingface-cli
-pip install huggingface_hub
 
-# Download model weights
-huggingface-cli download XuanHuang0/GenHOI --local-dir models/
-
-# Download demo data and assets
-huggingface-cli download XuanHuang0/GenHOI-data --repo-type dataset --local-dir .
-```
-
-### Option 3: Manual Download from Google Drive
-
-Download from: [Google Drive - GenHOI](https://drive.google.com/drive/folders/xxx)
 
 ### Model Files Structure
 
@@ -136,9 +90,6 @@ tools/eval_fvd/
 ├── i3d_pretrained_400.pt      # I3D model for FVD (~50MB)
 └── resnet-50-kinetics.pth     # ResNet-50 Kinetics (~100MB)
 ```
-
-> **Note**: Update the download links after uploading. See [UPLOAD_GUIDE.md](UPLOAD_GUIDE.md) for upload instructions.
-
 ## 🚀 Quick Start
 
 ### Run Demo
@@ -320,20 +271,7 @@ Adjust generation quality vs. speed trade-off:
 num_inference_steps=50  # Higher = better quality, slower
 ```
 
-## 📋 Requirements
-
-Main dependencies:
-- `torch>=2.0`
-- `transformers==4.46.2`
-- `controlnet-aux==0.0.7`
-- `decord`
-- `einops`
-- `safetensors`
-- `cupy-cuda12x`
-
-See `requirements.txt` for the complete list.
-
-## 🏗️ Project Structure
+<!-- ## 🏗️ Project Structure
 
 ```
 GenHOI/
@@ -350,7 +288,7 @@ GenHOI/
 ├── models/                       # Model weights directory
 ├── demo/                         # Demo data and examples
 └── requirements.txt
-```
+``` -->
 
 ## 📖 Citation
 
@@ -373,7 +311,7 @@ This project is built upon:
 
 ## 📄 License
 
-This project is released under the [Apache 2.0 License](LICENSE).
+This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
 
 ## 📧 Contact
 

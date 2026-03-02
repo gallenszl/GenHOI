@@ -17,7 +17,7 @@ from diffsynth.models.set_condition_branch import set_attn_gate
 
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = '127.0.0.1'
-    os.environ['MASTER_PORT'] = '29979'
+    os.environ['MASTER_PORT'] = '29999'
     dist.init_process_group(backend='nccl', rank=rank, world_size=world_size)
     torch.cuda.set_device(rank)
 
@@ -246,7 +246,7 @@ if __name__ == '__main__':
 #     --model_path models/GenHOI_wan_flf.consolidated \
 #     --output_dir results/swap_81 \
 #     --data_csv data/long_video_swap/swap.csv \
-#     --gpus 2 \
+#     --gpus 4,5,6,7 \
 #     --max_num_frames 81 \
 #     --is_fl
 
