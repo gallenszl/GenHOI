@@ -4,17 +4,6 @@
   <img src="src/teaser.png" width="100%">
 </p>
 
-GenHOI-VACE 是一个基于 [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2.1-VACE-14B) 的人物-物体交互（Human-Object Interaction）视频生成框架。本项目通过 Gate Attention 机制和 LoRA 微调，实现高质量的 HOI 视频生成与编辑。
-
-## 🌟 特性
-
-- **高质量 HOI 视频生成**：基于 Wan2.1-VACE-14B 强大的视频生成能力
-- **Gate Attention 机制**：通过可学习的门控注意力增强物体交互建模
-- **LoRA 微调**：高效的参数微调策略，支持快速适配不同场景
-- **多 GPU 并行推理**：支持多卡并行，大幅提升推理效率
-- **长视频生成**：支持首尾帧续推（First-Last Frame）模式，生成任意长度视频
-- **灵活的数据格式**：支持多种数据集格式（AnchorCrafter、通用 HOI 格式）
-
 ## 📋 目录
 
 - [环境配置](#-环境配置)
@@ -28,29 +17,7 @@ GenHOI-VACE 是一个基于 [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2
 ## 🔧 环境配置
 
 ### 依赖安装
-
-```bash
-# 创建 conda 环境
-conda create -n genhoi python=3.10 -y
-conda activate genhoi
-
-# 安装 PyTorch (根据你的 CUDA 版本选择)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
-# 安装其他依赖
-pip install -r requirements.txt
-```
-
-### 主要依赖
-
-- Python >= 3.10
-- PyTorch >= 2.0
-- CUDA >= 12.1
-- decord
-- einops
-- modelscope
-- safetensors
-
+Please refer to [Wan2.1-VACE](https://github.com/ali-vilab/VACE) for the environment installation instructions.
 ## 📦 模型权重
 
 ### 基础模型
@@ -63,7 +30,7 @@ huggingface-cli download Wan-AI/Wan2.1-VACE-14B --local-dir models/Wan2.1-VACE-1
 ```
 
 ### GenHOI 权重
-
+从 HuggingFace 下载 GenHOI-VACE的权重：
 将 GenHOI 微调权重放置在 `models/GenHOI_VACE/` 目录下：
 
 | 文件名 | 说明 |
