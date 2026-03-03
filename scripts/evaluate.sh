@@ -1,0 +1,1 @@
+bash tools/batch_eval_unified.sh results/swap_vace_ff 81 cuda
