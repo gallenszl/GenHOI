@@ -1,1 +1,1 @@
-bash tools/batch_eval_unified.sh /root/paddlejob/workspace/huangxuan/GenHOI/results/swap_81_vace_flf 81 cuda
+bash tools/batch_eval_unified.sh /root/paddlejob/workspace/huangxuan/GenHOI/results/swap_vace_ff 81 cuda
