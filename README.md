@@ -1,50 +1,80 @@
-# GenHOI-VACE
+# GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection
 
 <p align="center">
-  <img src="src/teaser.png" width="100%">
+  <img src="assets/teaser.png" width="90%">
 </p>
 
-## 📋 目录
+This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/abs/2508.01488).
 
-- [环境配置](#-环境配置)
-- [模型权重](#-模型权重)
-- [快速开始](#-快速开始)
-- [数据集格式](#-数据集格式)
-- [推理示例](#-推理示例)
-- [项目结构](#-项目结构)
-- [致谢](#-致谢)
+<!-- ## ✨ Features
 
-## 🔧 环境配置
+- **Generalizable Object Swapping**: Replace objects in videos while maintaining natural hand-object interactions
+- **High-Quality Video Generation**: Based on Wan2.1-I2V-14B model for photorealistic results
+- **Flexible Frame Control**: Support for variable frame lengths (up to 400+ frames)
+- **Multi-GPU Inference**: Distributed processing for efficient generation
+- **Fine-grained Control**: Object mask and reference image guided generation -->
 
-### 依赖安装
-Please refer to [Wan2.1-VACE](https://github.com/ali-vilab/VACE) for the environment installation instructions.
-## 📦 模型权重
+## 🌿 Branch Information
 
-### 基础模型
+This project contains **two branches** with different base models:
 
-从 HuggingFace 下载 Wan2.1-VACE-14B 基础模型：
+| Branch | Base Model | Description | Environment Reference |
+|--------|------------|-------------|----------------------|
+| **main** | [Wan2.1](https://github.com/Wan-Video/Wan2.1) | GenHOI based on Wan2.1-I2V-14B model | [Wan2.1 Installation](https://github.com/Wan-Video/Wan2.1#installation) |
+| **vace** | [VACE](https://github.com/ali-vilab/VACE) | GenHOI based on vace model| [VACE Installation](https://github.com/ali-vilab/VACE#installation) |
+
+### Switch Branch
 
 ```bash
-# 使用 modelscope 或 huggingface-cli 下载
+# Use Wan2.1 based version (default)
+git checkout main
+
+# Use VACE based version
+git checkout vace
+```
+
+**Below, we introduce how to start the VACE-based GenHOI. We highly recommend using the VACE-based version for better performance. For instructions on the WAN-based GenHOI, please refer to the README file in the corresponding branch.**
+
+### Installation
+Please refer to [Wan2.1-VACE](https://github.com/ali-vilab/VACE) for the environment installation instructions.
+## 📦 Model Weights
+
+### Base Model
+
+Download Wan2.1-VACE-14B base model from HuggingFace:
+
+```bash
+# Download using modelscope or huggingface-cli
 huggingface-cli download Wan-AI/Wan2.1-VACE-14B --local-dir models/Wan2.1-VACE-14B
 ```
 
-### GenHOI 权重
-从 HuggingFace 下载 GenHOI-VACE的权重：
-将 GenHOI 微调权重放置在 `models/GenHOI_VACE/` 目录下：
+### GenHOI Weights
+Download model from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)
 
-| 文件名 | 说明 |
+Place GenHOI fine-tuned weights in the `models/GenHOI_VACE/` directory:
+
+| Filename | Description |
 |--------|------|
-| `step-5000-gate_attn.safetensors` | Gate Attention 权重 |
-| `step-1700-lora-gate-720.safetensors` | LoRA 权重 (720p) |
-| `step-1100-lora-gate-flf-720-2.safetensors` | First-Last Frame 模式 LoRA 权重 |
+| `step-5000-gate_attn.safetensors` | Gate Attention Weights |
+| `step-1700-lora-gate-720.safetensors` | LoRA Weights (720p) |
+| `step-1100-lora-gate-flf-720-2.safetensors` | First-Last Frame Mode LoRA Weights |
 
-## 🚀 快速开始
+### Evaluation Models (Optional)
 
-### Self-Swap 推理（自身替换）
+For running evaluation metrics (FVD, FID), download additional models to `tools/eval_fvd/`:
 
-适用于 AnchorCrafter 风格的数据集，保持人物外观一致性：
+```
+tools/eval_fvd/
+├── i3d_pretrained_400.pt      # I3D model for FVD (~50MB)
+└── resnet-50-kinetics.pth     # ResNet-50 Kinetics (~100MB)
+```
 
+## Evaluation dataset
+Please download the corresponding evaluation dataset from [Hugging Face - GenHOI-data](https://huggingface.co/datasets/szlgallen/GenHOI)
+
+## 🚀 Quick Start
+We provide a quick start demo included in this repository. To run on our full evaluation dataset, simply download the dataset from Hugging Face and change the `data_csv` argument to `data/long_video_swap/swap.csv` (from the downloaded evaluation dataset).
+### Self-Swap(Reconstruct)
 ```bash
 python examples/wanvideo/selfswap_infer.py \
     --output_dir results/selfswap_demo \
@@ -55,9 +85,7 @@ python examples/wanvideo/selfswap_infer.py \
     --lora_path models/GenHOI_VACE/step-1700-lora-gate-720.safetensors
 ```
 
-### Object-Swap 推理（物体替换）
-
-适用于 HOI 物体交换任务：
+### Object-Swap
 
 ```bash
 python examples/wanvideo/swap_infer.py \
@@ -69,8 +97,8 @@ python examples/wanvideo/swap_infer.py \
     --lora_path models/GenHOI_VACE/step-1700-lora-gate-720.safetensors
 ```
 
-### 启用 First-Last Frame 模式（长视频生成）
-
+### Enable First-Last Frame Mode
+you can just add `--is_fl` argument to enable the FLF mode
 ```bash
 python examples/wanvideo/selfswap_infer.py \
     --output_dir results/selfswap_flf \
@@ -82,128 +110,85 @@ python examples/wanvideo/selfswap_infer.py \
     --is_fl
 ```
 
-## 📁 数据集格式
+### Arguments
 
-数据集使用 CSV 格式，包含以下字段：
-
-```csv
-video_path,object_mask_path,hand_mask_path,depth_path,prompt,reference_image
-/path/to/video.mp4,/path/to/object_mask.mp4,/path/to/hand_mask.mp4,/path/to/depth.mp4,"A person holding an object",/path/to/ref.jpg
-```
-
-### 字段说明
-
-| 字段 | 说明 | 必需 |
-|------|------|------|
-| `video_path` | 原始视频路径 | ✅ |
-| `object_mask_path` | 物体 mask 视频路径 | ✅ |
-| `hand_mask_path` | 手部 mask 视频路径 | 可选 |
-| `depth_path` | 深度图视频路径 | 可选 |
-| `prompt` | 文本描述 | ✅ |
-| `reference_image` | 参考图像路径 | ✅ |
-
-## 🎯 推理示例
-
-### 参数说明
-
-| 参数 | 说明 | 默认值 |
+| Argument | Description | Default |
 |------|------|--------|
-| `--output_dir` | 输出目录 | `results/` |
-| `--data_csv` | 数据集 CSV 文件路径 | - |
-| `--gpus` | 使用的 GPU 索引，逗号分隔 | `0,1,2,3` |
-| `--max_num_frames` | 最大帧数 | `81` |
-| `--is_fl` | 启用 First-Last Frame 模式 | `False` |
-| `--model_path` | Gate Attention 模型路径 | - |
-| `--lora_path` | LoRA 权重路径 | - |
+| `--output_dir` | Output directory | `results/` |
+| `--data_csv` | Dataset CSV file path | - |
+| `--gpus` | GPU indices to use, comma separated | `0,1,2,3` |
+| `--max_num_frames` | Maximum number of frames | `81` |
+| `--is_fl` | Enable First-Last Frame Mode | `False` |
+| `--model_path` | Gate Attention model path | - |
+| `--lora_path` | LoRA weights path | - |
 
-### 多 GPU 并行推理
+### Evaluate Results
 
-```bash
-# 使用 4 张 GPU 并行推理
-python examples/wanvideo/swap_infer.py \
-    --output_dir results/swap_multi_gpu \
-    --data_csv data/dataset.csv \
-    --gpus 0,1,2,3 \
-    --max_num_frames 81
-```
-
-### 长视频生成（401 帧）
+After running inference, use the unified evaluation script to compute metrics:
 
 ```bash
-python examples/wanvideo/swap_infer.py \
-    --output_dir results/swap_long \
-    --data_csv data/dataset.csv \
-    --gpus 0,1,2,3 \
-    --max_num_frames 401 \
-    --is_fl
+# Usage: bash tools/batch_eval_unified.sh <base_dir> [sample_duration] [device]
+
+# Evaluate 81-frame results
+bash tools/batch_eval_unified.sh results/swap_81 81 cuda
+bash tools/batch_eval_unified.sh results/selfswap_81 81 cuda
+
+# Evaluate 401-frame results
+bash tools/batch_eval_unified.sh results/swap_401 401 cuda
+bash tools/batch_eval_unified.sh results/selfswap_401 401 cuda
 ```
 
-## 📂 项目结构
+The evaluation script computes the following metrics:
 
-```
-GenHOI/
-├── diffsynth/                    # 核心推理库
-│   ├── models/                   # 模型定义
-│   │   ├── wan_video_vace.py     # VACE 模型
-│   │   ├── wan_video_dit.py      # DiT 模型
-│   │   ├── wan_video_vae.py      # VAE 模型
-│   │   └── set_condition_branch.py # Gate Attention 设置
-│   ├── pipelines/                # 推理 Pipeline
-│   │   └── wan_video_new.py      # Wan Video Pipeline
-│   ├── prompters/                # Prompt 处理
-│   └── schedulers/               # 调度器
-├── examples/
-│   └── wanvideo/
-│       ├── selfswap_infer.py     # Self-Swap 推理脚本
-│       ├── swap_infer.py         # Object-Swap 推理脚本
-│       └── dataset/              # 数据集处理
-│           ├── customer_dataset.py
-│           └── customer_dataset_anchorcrafter.py
-├── models/
-│   └── GenHOI_VACE/              # 模型权重
-├── results/                      # 推理结果
-├── demo/                         # Demo 数据
-└── README.md
-```
+| Metric | Description |
+|--------|-------------|
+| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception) |
+| **FID-VID** | Fréchet Inception Distance for video frames |
+| **FID** | Fréchet Inception Distance (frame-level) |
+| **PSNR** | Peak Signal-to-Noise Ratio |
+| **SSIM** | Structural Similarity Index |
+| **OC** | Object-CLIP similarity score |
 
-## 🔍 技术细节
+Results are saved to `<base_dir>/all_metrics.json`.
 
-### Gate Attention 机制
+## 📊 Data Format
 
-GenHOI 通过在 VACE 模块中引入可学习的 Gate Attention，增强对人物-物体交互的建模能力：
+### Input CSV Structure
 
-```python
-from diffsynth.models.set_condition_branch import set_stand_in
+Create a CSV file with the following columns:
 
-# 初始化 Gate Attention
-set_stand_in(
-    pipe.vace,
-    model_path=None,
-    train=False,
-    only_gate=True
-)
+| Column | Description |
+|--------|-------------|
+| `video_path` | Path to source video |
+| `obj_mask_path` | Path to object mask video (white mask on object region) |
+| `input_path` | Path to video with replaced background/object |
+| `ref_img` | Path to reference image of the target object |
+
+Example `demo.csv`:
+```csv
+video_path,obj_mask_path,input_path,ref_img
+demo/10/26_78/video.mp4,demo/10/26_78/mask.mp4,demo/10/26_78/video_replace.mp4,demo/10/26_78/ref_img.png
 ```
 
-### 首尾帧续推
+### Preparing Your Own Data
 
-长视频通过分段生成并使用首尾帧续推策略保持时序一致性：
+1. **Source Video** (`video_path`): Original video with human-object interaction
+2. **Object Mask** (`obj_mask_path`): Binary mask video highlighting the object region (white: object, black: background)
+3. **Replacement Video** (`input_path`): Video with the original object removed/replaced
+4. **Reference Image** (`ref_img`): Clear image of the target object you want to insert
 
-1. 将长视频分割为多个 clip（每个 81 帧）
-2. 每个 clip 的首帧使用上一个 clip 的最后一帧
-3. 对应的 mask 首帧置为全黑（表示该区域已生成）
+## 🙏 Acknowledgements
 
-## 🙏 致谢
+This project is based on the following open-source works:
 
-本项目基于以下开源工作：
-
-- [Wan2.1-VACE](https://github.com/Wan-Video/Wan2.1) - 基础视频生成模型
-- [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) - 推理框架
-- [AnchorCrafter](https://github.com/AnchorCrafter/AnchorCrafter) - 数据集格式参考
+- [Wan2.1-VACE](https://github.com/Wan-Video/Wan2.1) - Base video generation model
+- [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) - Inference framework
+- [AnchorCrafter](https://github.com/AnchorCrafter/AnchorCrafter) - Dataset format reference
 
 ## 📄 License
 
-本项目遵循 Apache 2.0 License。
+This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
 
-## ?? 联系方式
+## ?? Contact
 
-如有问题或建议，欢迎提交 Issue 或 PR。
+If you have any questions or suggestions, please feel free to submit an Issue or PR.
