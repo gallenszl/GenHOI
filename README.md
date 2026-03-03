@@ -59,7 +59,7 @@ Place GenHOI fine-tuned weights in the `models/GenHOI_VACE/` directory:
 | `step-1700-lora-gate-720.safetensors` | LoRA Weights (720p) |
 | `step-1100-lora-gate-flf-720-2.safetensors` | First-Last Frame Mode LoRA Weights |
 
-### Evaluation Models (Optional)
+<!-- ### Evaluation Models (Optional)
 
 For running evaluation metrics (FVD, FID), download additional models to `tools/eval_fvd/`:
 
@@ -67,7 +67,7 @@ For running evaluation metrics (FVD, FID), download additional models to `tools/
 tools/eval_fvd/
 ├── i3d_pretrained_400.pt      # I3D model for FVD (~50MB)
 └── resnet-50-kinetics.pth     # ResNet-50 Kinetics (~100MB)
-```
+``` -->
 
 ## Evaluation dataset
 Please download the corresponding evaluation dataset from [Hugging Face - GenHOI-data](https://huggingface.co/datasets/szlgallen/GenHOI)
@@ -124,7 +124,13 @@ python examples/wanvideo/selfswap_infer.py \
 
 ### Evaluate Results
 
-After running inference, use the unified evaluation script to compute metrics:
+The evaluation code is provided in the `main` branch.
+
+<strong style="color:red;">IMPORTANT: Please switch to the `main` branch before proceeding.</strong>
+
+Please refer to the **Evaluation** section of the README in the `main` branch for detailed instructions.  Below, we provide a brief overview of the startup commands and supported evaluation metrics.
+
+
 
 ```bash
 # Usage: bash tools/batch_eval_unified.sh <base_dir> [sample_duration] [device]
@@ -183,12 +189,7 @@ This project is based on the following open-source works:
 
 - [Wan2.1-VACE](https://github.com/Wan-Video/Wan2.1) - Base video generation model
 - [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) - Inference framework
-- [AnchorCrafter](https://github.com/AnchorCrafter/AnchorCrafter) - Dataset format reference
 
 ## 📄 License
 
 This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
-
-## ?? Contact
-
-If you have any questions or suggestions, please feel free to submit an Issue or PR.
