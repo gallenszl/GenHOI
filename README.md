@@ -6,13 +6,9 @@
 
 This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/abs/2508.01488).
 
-<!-- ## ✨ Features
+## 🚀 Update
 
-- **Generalizable Object Swapping**: Replace objects in videos while maintaining natural hand-object interactions
-- **High-Quality Video Generation**: Based on Wan2.1-I2V-14B model for photorealistic results
-- **Flexible Frame Control**: Support for variable frame lengths (up to 400+ frames)
-- **Multi-GPU Inference**: Distributed processing for efficient generation
-- **Fine-grained Control**: Object mask and reference image guided generation -->
+- 🔥 **GenHOI-VACE Released!** Now available in the `vace` branch with significantly improved generalization performance. We recommend starting with this version.
 
 ## 🌿 Branch Information
 
@@ -33,7 +29,19 @@ git checkout main
 git checkout vace
 ```
 
-Below, we introduce how to start the Wan-based GenHOI. For instructions on the VACE-based GenHOI, please refer to the README file in the corresponding branch.
+The performance comparison between the two versions and existing methods is shown in the figure below.
+
+> **⚠️ We strongly recommend that users start with the `vace` version due to its superior generalization capability.**
+  
+The corresponding code and detailed instructions can be found in the `vace` branch.
+
+
+<p align="center">
+  <img src="assets/comparison.png" width="90%">
+</p>
+
+Below, we introduce how to start the `Wan-based GenHOI`. 
+
 <!-- ### Branch Comparison
 
 | Feature | main (Wan2.1) | vace (VACE) |
@@ -47,8 +55,7 @@ Below, we introduce how to start the Wan-based GenHOI. For instructions on the V
 > **Note**: Please refer to the respective official repositories ([Wan2.1](https://github.com/Wan-Video/Wan2.1) / [VACE](https://github.com/ali-vilab/VACE)) for environment setup and dependencies. -->
 
 ## 📦 Environment Installation
-We recommend follo
-w the environment setting of  [Wan2.1](https://github.com/Wan-Video/Wan2.1) to install the environment dependencies.
+We recommend follow the environment setting of  [Wan2.1](https://github.com/Wan-Video/Wan2.1) to install the environment dependencies.
 
 
 ## 📂 Model Weights
@@ -313,9 +320,7 @@ This project is built upon:
 
 This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
 
-## 📧 Contact
 
-For questions and discussions, please open an issue or contact us at [your-email@example.com].
 
 ---
 
