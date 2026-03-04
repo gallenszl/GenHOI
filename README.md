@@ -41,7 +41,7 @@ Please refer to [Wan2.1-VACE](https://github.com/ali-vilab/VACE) for the environ
 
 ### Base Model
 
-Download Wan2.1-VACE-14B base model from HuggingFace:
+Download Wan2.1-VACE-14B base model from HuggingFace. In most cases, the model will be downloaded automatically. If not, you can manually download it and place it in the required directory.
 
 ```bash
 # Download using modelscope or huggingface-cli
