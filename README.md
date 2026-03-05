@@ -90,7 +90,7 @@ models/
 
 ### Evaluation Models (Optional)
 
-For running evaluation metrics (FVD, FID), download additional models to `tools/eval_fvd/`:
+For running evaluation metrics (FVD, FID), download additional models ([Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)) to `tools/eval_fvd/`:
 
 ```
 tools/eval_fvd/
@@ -204,7 +204,7 @@ The evaluation script computes the following metrics:
 
 | Metric | Description |
 |--------|-------------|
-| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception) |
+| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception). The default metric reported in the paper is calculated by the 3D Inception network.|
 | **FID-VID** | Fréchet Inception Distance for video frames |
 | **FID** | Fréchet Inception Distance (frame-level) |
 | **PSNR** | Peak Signal-to-Noise Ratio |
@@ -213,6 +213,9 @@ The evaluation script computes the following metrics:
 
 Results are saved to `<base_dir>/all_metrics.json`.
 
+> **Note:**  
+> For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.  
+> **However, for Cross-Reenactment, only FVD and FID are valid metrics.**
 ## 📊 Data Format
 
 ### Input CSV Structure
@@ -247,12 +250,9 @@ Generated results are saved in the specified output directory:
 results/demo/
 └── sample_0000_allclips/
     ├── all_generated.mp4      # Final generated video
-    ├── all_control.mp4        # Control signal visualization
-    ├── all_replaced.mp4       # Object replacement result
+    ├── all_control.mp4        # Control replacement result
     ├── all_gt.mp4             # Ground truth video
-    ├── all_ref.mp4            # Reference visualization
-    ├── all_handpose.mp4       # Hand pose visualization
-    └── all_stitched_2x2.mp4   # 2x2 grid comparison video
+    ├── all_ref.mp4            # Reference 
 ```
 
 ## 🔧 Advanced Configuration
