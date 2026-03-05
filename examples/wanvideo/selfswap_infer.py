@@ -56,12 +56,20 @@ def ensure_pil_list(frames: List[Union[Image.Image, torch.Tensor, np.ndarray]]) 
 
 def save_clip_sample_videos(clip_sample, clip_dir, fps=25):
     from diffsynth import save_video
+    # 视频命名映射
+    key_name_map = {
+        "vace_reference_image": "all_ref.mp4",
+        "video": "all_gt.mp4",
+        "vace_video": "all_control.mp4",
+        "vace_video_mask": "all_handpose.mp4",
+    }
     for key, value in clip_sample.items():
         try:
             if isinstance(value, list) and len(value) > 0:
                 if isinstance(value[0], (Image.Image, torch.Tensor, np.ndarray)):
                     frames = ensure_pil_list(value)
-                    save_video(frames, os.path.join(clip_dir, f"clip_{key}.mp4"), fps=fps, quality=8)
+                    filename = key_name_map.get(key, f"{key}.mp4")
+                    save_video(frames, os.path.join(clip_dir, filename), fps=fps, quality=8)
             elif isinstance(value, (Image.Image, torch.Tensor, np.ndarray)):
                 img = _to_pil(value)
                 img.save(os.path.join(clip_dir, f"clip_{key}.png"))
@@ -71,7 +79,7 @@ def save_clip_sample_videos(clip_sample, clip_dir, fps=25):
 
 # ============== 核心推理逻辑 ==============
 
-def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
+def worker(rank, gpu_id, dataset, total_gpus, output_dir, model_path, lora_path):
     """每个GPU独立进程，处理索引 rank, rank+G, rank+2G,..."""
     device = torch.device(f"cuda:{gpu_id}")
     print(f"[GPU {gpu_id}] starting...")
@@ -97,7 +105,6 @@ def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
         pipe.vace,
         model_path=None,
         train=False,
-        only_gate=True
     )
 
     state_dict = load_state_dict(model_path)
@@ -112,7 +119,7 @@ def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
         "畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景"
     )
 
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     for idx in range(rank, len(dataset), total_gpus):
         # if idx <= 3:
@@ -164,7 +171,7 @@ def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
 
             # ====== 保存当前 clip 的输入（方便 debug） ======
 
-            clip_dir = os.path.join(OUTPUT_DIR, f"sample_{idx:04d}_clip{clip_id:02d}")
+            clip_dir = os.path.join(output_dir, f"sample_{idx:04d}_clip{clip_id:02d}")
             os.makedirs(clip_dir, exist_ok=True)
             save_clip_sample_videos(clip_sample, clip_dir, fps=25)
 
@@ -176,7 +183,7 @@ def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
                 vace_reference_image=clip_sample['vace_reference_image'][0],
                 vace_video_mask=clip_sample.get('vace_video_mask', None),
                 num_frames=len(clip_sample['vace_video']),
-                num_inference_steps=10,
+                num_inference_steps=1,
                 seed=1024,
                 tiled=True,
                 width=w,
@@ -184,11 +191,11 @@ def worker(rank, gpu_id, dataset, total_gpus, model_path, lora_path):
             )
 
             if SAVE_PER_CLIP:
-                save_video(out_video, os.path.join(clip_dir, "generated.mp4"), fps=25, quality=8)
+                save_video(out_video, os.path.join(clip_dir, "all_generated.mp4"), fps=25, quality=8)
 
             agg['gen'].extend(out_video)
 
-        all_dir = os.path.join(OUTPUT_DIR, f"sample_{idx:04d}_allclips")
+        all_dir = os.path.join(output_dir, f"sample_{idx:04d}_allclips")
         os.makedirs(all_dir, exist_ok=True)
         save_video(agg['gen'], os.path.join(all_dir, "all_generated.mp4"), fps=25, quality=8)
 
@@ -230,7 +237,7 @@ def run_inference_multi(output_dir, data_csv, max_num_frames, is_fl, model_path,
     ctx = mp.get_context("spawn")
     procs = []
     for rank, gpu_id in enumerate(devices):
-        p = ctx.Process(target=worker, args=(rank, gpu_id, dataset, total_gpus, model_path, lora_path))
+        p = ctx.Process(target=worker, args=(rank, gpu_id, dataset, total_gpus, OUTPUT_DIR, model_path, lora_path))
         p.start()
         procs.append(p)
 

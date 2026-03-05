@@ -55,12 +55,20 @@ def ensure_pil_list(frames: List[Union[Image.Image, torch.Tensor, np.ndarray]]) 
 
 def save_clip_sample_videos(clip_sample, clip_dir, fps=25):
     from diffsynth import save_video
+    # 视频命名映射
+    key_name_map = {
+        "vace_reference_image": "all_ref.mp4",
+        "video": "all_gt.mp4",
+        "vace_video": "all_control.mp4",
+        "vace_video_mask": "all_handpose.mp4",
+    }
     for key, value in clip_sample.items():
         try:
             if isinstance(value, list) and len(value) > 0:
                 if isinstance(value[0], (Image.Image, torch.Tensor, np.ndarray)):
                     frames = ensure_pil_list(value)
-                    save_video(frames, os.path.join(clip_dir, f"clip_{key}.mp4"), fps=fps, quality=8)
+                    filename = key_name_map.get(key, f"{key}.mp4")
+                    save_video(frames, os.path.join(clip_dir, filename), fps=fps, quality=8)
             elif isinstance(value, (Image.Image, torch.Tensor, np.ndarray)):
                 img = _to_pil(value)
                 img.save(os.path.join(clip_dir, f"clip_{key}.png"))
@@ -174,7 +182,7 @@ def worker(rank, gpu_id, dataset, total_gpus, output_dir, model_path, lora_path)
                 vace_reference_image=clip_sample['vace_reference_image'],
                 vace_video_mask=clip_sample.get('vace_video_mask', None),
                 num_frames=len(clip_sample['vace_video']),
-                num_inference_steps=30,
+                num_inference_steps=1,
                 seed=1024,
                 tiled=True,
                 width=w,
@@ -182,7 +190,7 @@ def worker(rank, gpu_id, dataset, total_gpus, output_dir, model_path, lora_path)
             )
 
             if SAVE_PER_CLIP:
-                save_video(out_video, os.path.join(clip_dir, "generated.mp4"), fps=25, quality=8)
+                save_video(out_video, os.path.join(clip_dir, "all_generated.mp4"), fps=25, quality=8)
 
             agg['gen'].extend(out_video)
 
