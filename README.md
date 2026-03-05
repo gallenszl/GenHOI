@@ -148,7 +148,7 @@ The evaluation script computes the following metrics:
 
 | Metric | Description |
 |--------|-------------|
-| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception) |
+| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception). The default metric reported in the paper is calculated with the 3D Inception network..|
 | **FID-VID** | Fréchet Inception Distance for video frames |
 | **FID** | Fréchet Inception Distance (frame-level) |
 | **PSNR** | Peak Signal-to-Noise Ratio |
@@ -156,6 +156,9 @@ The evaluation script computes the following metrics:
 | **OC** | Object-CLIP similarity score |
 
 Results are saved to `<base_dir>/all_metrics.json`.
+
+**Note:** For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.  
+However, for **Cross-Reenactment**, **only FVD and FID are valid metrics**.
 
 ## 📊 Data Format
 
