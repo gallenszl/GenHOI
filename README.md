@@ -78,7 +78,7 @@ We provide a quick start demo included in this repository. To run on our full ev
 ```bash
 python examples/wanvideo/selfswap_infer.py \
     --output_dir results/selfswap_demo \
-    --data_csv demo/demo.csv \
+    --data_csv demo/demo_selfswap.csv \
     --gpus 0 \
     --max_num_frames 81 \
     --model_path models/GenHOI_VACE/step-5000-gate_attn.safetensors \
