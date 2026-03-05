@@ -9,11 +9,11 @@ def set_stand_in(pipe, train=False, model_path=None, only_gate=False):
     if model_path is not None and only_gate is False:
         print(f"Loading Stand-In weights from: {model_path}")
         load_lora_weights_into_pipe(pipe, model_path)
-    if model_path is not None and only_gate:
-        print(f"Loading gate weights from: {model_path}")
-        state_dict = load_state_dict(model_path)
-        state_dict = mapping_gate_state_dict(state_dict)
-        pipe.load_state_dict(state_dict, strict=False)
+    # if model_path is not None and only_gate:
+    #     print(f"Loading gate weights from: {model_path}")
+    #     state_dict = load_state_dict(model_path)
+    #     state_dict = mapping_gate_state_dict(state_dict)
+    #     pipe.load_state_dict(state_dict, strict=False)
     
 
 

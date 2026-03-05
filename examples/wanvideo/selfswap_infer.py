@@ -183,7 +183,7 @@ def worker(rank, gpu_id, dataset, total_gpus, output_dir, model_path, lora_path)
                 vace_reference_image=clip_sample['vace_reference_image'][0],
                 vace_video_mask=clip_sample.get('vace_video_mask', None),
                 num_frames=len(clip_sample['vace_video']),
-                num_inference_steps=1,
+                num_inference_steps=50,
                 seed=1024,
                 tiled=True,
                 width=w,
@@ -230,7 +230,8 @@ def run_inference_multi(output_dir, data_csv, max_num_frames, is_fl, model_path,
         ref_first_frame=True,
         ref_img=None,
         is_test=True,
-        last_frame=is_fl
+        last_frame=is_fl,
+        data_root=None
     )
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)

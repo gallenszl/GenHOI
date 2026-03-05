@@ -265,7 +265,7 @@ def apply_mask_and_crop(img_path, mask_path):
 
 
 class HumanHoiDataset_anchorcrafter(Dataset):
-    def __init__(self, data_dir="", video_size=768, fps=25, max_num_frames=7, skip_frms_num=3, ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123", data_aug=True, is_random=True, ref_img=None, ref_first_frame=False, is_test=False, is_rehold=True, last_frame=False):
+    def __init__(self, data_dir="", video_size=768, fps=25, max_num_frames=7, skip_frms_num=3, ref_id_type="random", draw_hand_color="ori", info_class="dwpose_test123", data_aug=True, is_random=True, ref_img=None, ref_first_frame=False, is_test=False, is_rehold=True, last_frame=False, data_root=None):
         """
         skip_frms_num: ignore the first and the last xx frames, avoiding transitions.
         """
@@ -303,7 +303,9 @@ class HumanHoiDataset_anchorcrafter(Dataset):
         self.draw_hand_color = draw_hand_color
         self.info_class = info_class
 
-        self.data_root = "/root/paddlejob/workspace/huangxuan/AnchorCrafter-400_405f"
+        if data_root is not None:
+            self.data_root = data_root
+        self.data_root = ""
         self.caption_path = "prompt/prompt_all_v2.txt"
         self.caption_root = "/root/paddlejob/workspace/huangxuan/bos_data/yqw/processed_human_videos"
         
