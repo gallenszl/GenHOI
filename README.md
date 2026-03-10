@@ -178,18 +178,6 @@ python examples/wanvideo/test_swap.py \
     --max_num_frames 81 \
     --is_fl
 ```
-
-### Arguments
-
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--model_path` | `models/ckpt/first_frame_rope.consolidated` | Path to GenHOI checkpoint |
-| `--output_dir` | `results/demo` | Output directory for generated videos |
-| `--data_csv` | `demo/demo.csv` | Path to input data CSV file |
-| `--gpus` | `0` | GPU indices (comma-separated, e.g., `0,1,2,3`) |
-| `--max_num_frames` | `81` | Maximum frames to generate |
-| `--is_fl` | `False` | Enable first-last frame mode |
-
 ### Multi-GPU Inference
 
 For faster inference, use multiple GPUs:
@@ -267,18 +255,6 @@ bash tools/batch_eval_unified.sh results/selfswap_81 81 cuda
 bash tools/batch_eval_unified.sh results/swap_401 401 cuda
 bash tools/batch_eval_unified.sh results/selfswap_401 401 cuda
 ```
-
-The evaluation script computes the following metrics:
-
-| Metric | Description |
-|--------|-------------|
-| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception). The default metric reported in the paper is calculated by the 3D Inception network.|
-| **FID-VID** | Fréchet Inception Distance for video frames |
-| **FID** | Fréchet Inception Distance (frame-level) |
-| **PSNR** | Peak Signal-to-Noise Ratio |
-| **SSIM** | Structural Similarity Index |
-| **OC** | Object-CLIP similarity score |
-
 Results are saved to `<base_dir>/all_metrics.json`.
 
 > **Note:**
@@ -289,16 +265,7 @@ Results are saved to `<base_dir>/all_metrics.json`.
 
 ### Input CSV Structure
 
-Create a CSV file with the following columns:
-
-| Column | Description |
-|--------|-------------|
-| `video_path` | Path to source video |
-| `obj_mask_path` | Path to object mask video (white mask on object region) |
-| `input_path` | Path to video with replaced background/object |
-| `ref_img` | Path to reference image of the target object |
-
-Example `demo.csv`:
+Create a CSV file like the following the example `demo.csv`:
 
 ```csv
 video_path,obj_mask_path,input_path,ref_img
@@ -396,3 +363,4 @@ This project is released under the [Creative Commons Attribution Non Commercial 
 <p align="center">
   <b>⭐ Star us on GitHub if you find this project useful!</b>
 </p>
+
