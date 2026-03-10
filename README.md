@@ -4,11 +4,11 @@
   <img src="assets/teaser.png" width="90%">
 </p>
 
-This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/abs/2508.01488).
+This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand-Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/pdf/2603.06048).
 
 ## 🚀 Update
 
-- 🔥 **GenHOI-VACE Released!** Now available in the `vace` branch with significantly improved generalization performance. We recommend starting with this version.
+🔥 **GenHOI-VACE Released!** Now available in the `vace` branch with significantly improved generalization performance. We recommend starting with this version.
 
 ## 🌿 Branch Information
 
@@ -32,15 +32,14 @@ git checkout vace
 The performance comparison between the two versions and existing methods is shown in the figure below.
 
 > **⚠️ We strongly recommend that users start with the `vace` version due to its superior generalization capability.**
-  
-The corresponding code and detailed instructions can be found in the `vace` branch.
 
+The corresponding code and detailed instructions can be found in the `vace` branch.
 
 <p align="center">
   <img src="assets/comparison.png" width="90%">
 </p>
 
-Below, we introduce how to start the `Wan-based GenHOI`. 
+Below, we introduce how to start the `Wan-based GenHOI`.
 
 <!-- ### Branch Comparison
 
@@ -55,18 +54,16 @@ Below, we introduce how to start the `Wan-based GenHOI`.
 > **Note**: Please refer to the respective official repositories ([Wan2.1](https://github.com/Wan-Video/Wan2.1) / [VACE](https://github.com/ali-vilab/VACE)) for environment setup and dependencies. -->
 
 ## 📦 Environment Installation
-We recommend follow the environment setting of  [Wan2.1](https://github.com/Wan-Video/Wan2.1) to install the environment dependencies.
 
+We recommend follow the environment setting of  [Wan2.1](https://github.com/Wan-Video/Wan2.1) to install the environment dependencies.
 
 ## 📂 Model Weights
 
-### Option 2: Manual Download from Hugging Face
+### Download from Hugging Face
 
 Download model from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)
 
 Demo data and assets: 🤗 [Hugging Face - GenHOI-data](https://huggingface.co/datasets/szlgallen/GenHOI)
-
-
 
 ### Model Files Structure
 
@@ -133,6 +130,31 @@ data/
 │   └── ...
 ```
 
+### Demo Files Structure
+
+After downloading, your `demo/` directory should look like:
+
+```text
+demo/
+├── demo.csv
+├── demo_selfswap.csv
+├── 10/
+│   └── 26_78/
+│       └── ...
+└── selfswap/
+    └── 10/
+        ├── video_cut/
+        │   └── ...
+        ├── obj_mask_cut/
+        │   └── ...
+        ├── object_mask_cut_/
+        │   └── 0/
+        │       └── ...
+        └── masked_object_cut_/
+            └── 0/
+                └── ...
+```
+
 ### Evaluation Models (Optional)
 
 For running evaluation metrics (FVD, FID), download additional models ([Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)) to `tools/eval_fvd/`:
@@ -142,6 +164,7 @@ tools/eval_fvd/
 ├── i3d_pretrained_400.pt      # I3D model for FVD (~50MB)
 └── resnet-50-kinetics.pth     # ResNet-50 Kinetics (~100MB)
 ```
+
 ## 🚀 Quick Start
 
 ### Run Demo
@@ -258,9 +281,10 @@ The evaluation script computes the following metrics:
 
 Results are saved to `<base_dir>/all_metrics.json`.
 
-> **Note:**  
-> For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.  
+> **Note:**
+> For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.
 > **However, for Cross-Reenactment, only FVD and FID are valid metrics.**
+
 ## 📊 Data Format
 
 ### Input CSV Structure
@@ -275,6 +299,7 @@ Create a CSV file with the following columns:
 | `ref_img` | Path to reference image of the target object |
 
 Example `demo.csv`:
+
 ```csv
 video_path,obj_mask_path,input_path,ref_img
 demo/10/26_78/video.mp4,demo/10/26_78/mask.mp4,demo/10/26_78/video_replace.mp4,demo/10/26_78/ref_img.png
@@ -297,7 +322,7 @@ results/demo/
     ├── all_generated.mp4      # Final generated video
     ├── all_control.mp4        # Control replacement result
     ├── all_gt.mp4             # Ground truth video
-    ├── all_ref.mp4            # Reference 
+    ├── all_ref.mp4            # Reference
 ```
 
 ## 🔧 Advanced Configuration
@@ -358,14 +383,13 @@ If you find this work useful, please consider citing:
 ## 🙏 Acknowledgements
 
 This project is built upon:
+
 - [Wan2.1](https://github.com/Wan-Video/Wan2.1) - Base video generation model
 - [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) - Diffusion synthesis framework
 
 ## 📄 License
 
 This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
-
-
 
 ---
 
