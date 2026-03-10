@@ -4,7 +4,7 @@
   <img src="assets/teaser.png" width="90%">
 </p>
 
-This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/abs/2508.01488).
+This is the official repository for the paper [GenHOI: Towards Object-Consistent Hand-Object Interaction with Temporally Balanced and Spatially Selective Object Injection](https://arxiv.org/pdf/2603.06048).
 
 <!-- ## ✨ Features
 
@@ -18,10 +18,10 @@ This is the official repository for the paper [GenHOI: Towards Object-Consistent
 
 This project contains **two branches** with different base models:
 
-| Branch | Base Model | Description | Environment Reference |
-|--------|------------|-------------|----------------------|
+| Branch   | Base Model                                    | Description                          | Environment Reference                                                   |
+| -------- | --------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
 | **main** | [Wan2.1](https://github.com/Wan-Video/Wan2.1) | GenHOI based on Wan2.1-I2V-14B model | [Wan2.1 Installation](https://github.com/Wan-Video/Wan2.1#installation) |
-| **vace** | [VACE](https://github.com/ali-vilab/VACE) | GenHOI based on vace model| [VACE Installation](https://github.com/ali-vilab/VACE#installation) |
+| **vace** | [VACE](https://github.com/ali-vilab/VACE)     | GenHOI based on vace model           | [VACE Installation](https://github.com/ali-vilab/VACE#installation)     |
 
 ### Switch Branch
 
@@ -36,7 +36,9 @@ git checkout vace
 **Below, we introduce how to start the VACE-based GenHOI. We highly recommend using the VACE-based version for better performance. For instructions on the WAN-based GenHOI, please refer to the README file in the corresponding branch.**
 
 ### Installation
+
 Please refer to [Wan2.1-VACE](https://github.com/ali-vilab/VACE) for the environment installation instructions.
+
 ## 📦 Model Weights
 
 ### Base Model
@@ -49,15 +51,28 @@ huggingface-cli download Wan-AI/Wan2.1-VACE-14B --local-dir models/Wan2.1-VACE-1
 ```
 
 ### GenHOI Weights
+
 Download model from: 🤗 [Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)
 
 Place GenHOI fine-tuned weights in the `models/GenHOI_VACE/` directory:
 
-| Filename | Description |
-|--------|------|
-| `step-5000-gate_attn.safetensors` | Gate Attention Weights |
-| `step-1700-lora-gate-720.safetensors` | LoRA Weights (720p) |
+| Filename                                    | Description                        |
+| ------------------------------------------- | ---------------------------------- |
+| `step-5000-gate_attn.safetensors`           | Gate Attention Weights             |
+| `step-1700-lora-gate-720.safetensors`       | LoRA Weights                       |
 | `step-1100-lora-gate-flf-720-2.safetensors` | First-Last Frame Mode LoRA Weights |
+
+### Model Files Structure
+
+After downloading, your `models/` directory should look like:
+
+```
+models/
+└── GenHOI_VACE/
+    ├── step-5000-gate_attn.safetensors
+    ├── step-1100-lora-gate-flf-720-2.safetensors
+    └── step-1700-lora-gate-720.safetensors
+```
 
 <!-- ### Evaluation Models (Optional)
 
@@ -70,11 +85,84 @@ tools/eval_fvd/
 ``` -->
 
 ## Evaluation dataset
+
 Please download the corresponding evaluation dataset from [Hugging Face - GenHOI-data](https://huggingface.co/datasets/szlgallen/GenHOI)
 
+### Data Files Structure
+
+After downloading, your `data/` directory should look like:
+
+```
+data/
+├── long_video_swap/
+│   ├── swap.csv
+│   ├── swap_f16.csv
+│   ├── 10/
+│   │   ├── 0_0/
+│   │   │   ├── video.mp4
+│   │   │   ├── mask.mp4
+│   │   │   ├── video_replace.mp4
+│   │   │   ├── ref_img.png
+│   │   │   ├── 0.png
+│   │   │   ├── 80.png
+│   │   │   └── ...
+│   │   ├── 0_1/
+│   │   └── ...
+│   ├── 11/
+│   └── 5/
+│
+├── AnchorCrafter-400_405f/
+│   ├── dataset_select.csv
+│   ├── dataset_select_f16.csv
+│   ├── dataset_select_f50.csv
+│   ├── 10/
+│   │   ├── video_cut/
+│   │   ├── obj_mask_cut/
+│   │   ├── object_mask_cut_/
+│   │   │   └── <clip_id>/
+│   │   │       ├── 01.jpg
+│   │   │       ├── 02.jpg
+│   │   │       └── 03.jpg
+│   │   └── masked_object_cut_/
+│   │       └── <clip_id>/
+│   │           ├── 01.jpg
+│   │           ├── 02.jpg
+│   │           └── 03.jpg
+│   ├── 11/
+│   ├── tune/
+│   └── ...
+```
+### Demo Files Structure
+
+After downloading, your `demo/` directory should look like:
+
+```text
+demo/
+├── demo.csv
+├── demo_selfswap.csv
+├── 10/
+│   └── 26_78/
+│       └── ...
+└── selfswap/
+    └── 10/
+        ├── video_cut/
+        │   └── ...
+        ├── obj_mask_cut/
+        │   └── ...
+        ├── object_mask_cut_/
+        │   └── 0/
+        │       └── ...
+        └── masked_object_cut_/
+            └── 0/
+                └── ...
+```
+
 ## 🚀 Quick Start
+
 We provide a quick start demo included in this repository. To run on our full evaluation dataset, simply download the dataset from Hugging Face and change the `data_csv` argument to `data/long_video_swap/swap.csv` (from the downloaded evaluation dataset).
+
 ### Self-Swap(Reconstruct)
+
 ```bash
 python examples/wanvideo/selfswap_infer.py \
     --output_dir results/selfswap_demo \
@@ -98,7 +186,9 @@ python examples/wanvideo/swap_infer.py \
 ```
 
 ### Enable First-Last Frame Mode
+
 you can just add `--is_fl` argument to enable the FLF mode
+
 ```bash
 python examples/wanvideo/selfswap_infer.py \
     --output_dir results/selfswap_flf \
@@ -110,18 +200,6 @@ python examples/wanvideo/selfswap_infer.py \
     --is_fl
 ```
 
-### Arguments
-
-| Argument | Description | Default |
-|------|------|--------|
-| `--output_dir` | Output directory | `results/` |
-| `--data_csv` | Dataset CSV file path | - |
-| `--gpus` | GPU indices to use, comma separated | `0,1,2,3` |
-| `--max_num_frames` | Maximum number of frames | `81` |
-| `--is_fl` | Enable First-Last Frame Mode | `False` |
-| `--model_path` | Gate Attention model path | - |
-| `--lora_path` | LoRA weights path | - |
-
 ### Evaluate Results
 
 The evaluation code is provided in the `main` branch.
@@ -129,8 +207,6 @@ The evaluation code is provided in the `main` branch.
 <strong style="color:red;">IMPORTANT: Please switch to the `main` branch before proceeding.</strong>
 
 Please refer to the **Evaluation** section of the README in the `main` branch for detailed instructions.  Below, we provide a brief overview of the startup commands and supported evaluation metrics.
-
-
 
 ```bash
 # Usage: bash tools/batch_eval_unified.sh <base_dir> [sample_duration] [device]
@@ -144,36 +220,17 @@ bash tools/batch_eval_unified.sh results/swap_401 401 cuda
 bash tools/batch_eval_unified.sh results/selfswap_401 401 cuda
 ```
 
-The evaluation script computes the following metrics:
-
-| Metric | Description |
-|--------|-------------|
-| **FVD** | Fréchet Video Distance (using 3D-ResNet50 and 3D-Inception). The default metric reported in the paper is calculated with the 3D Inception network..|
-| **FID-VID** | Fréchet Inception Distance for video frames |
-| **FID** | Fréchet Inception Distance (frame-level) |
-| **PSNR** | Peak Signal-to-Noise Ratio |
-| **SSIM** | Structural Similarity Index |
-| **OC** | Object-CLIP similarity score |
-
 Results are saved to `<base_dir>/all_metrics.json`.
 
-**Note:** For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.  
+**Note:** For both **Self-Reenactment** and **Cross-Reenactment**, all the metrics listed above will be calculated.
 However, for **Cross-Reenactment**, **only FVD and FID are valid metrics**.
 
 ## 📊 Data Format
 
 ### Input CSV Structure
 
-Create a CSV file with the following columns:
+Create a CSV file like the following example `demo.csv`:
 
-| Column | Description |
-|--------|-------------|
-| `video_path` | Path to source video |
-| `obj_mask_path` | Path to object mask video (white mask on object region) |
-| `input_path` | Path to video with replaced background/object |
-| `ref_img` | Path to reference image of the target object |
-
-Example `demo.csv`:
 ```csv
 video_path,obj_mask_path,input_path,ref_img
 demo/10/26_78/video.mp4,demo/10/26_78/mask.mp4,demo/10/26_78/video_replace.mp4,demo/10/26_78/ref_img.png
