@@ -88,6 +88,51 @@ models/
 └── GenHOI_wan_flf.consolidated    # Fine-tuned weights (~2-5GB)
 ```
 
+### Data Files Structure
+
+After downloading, your `data/` directory should look like:
+
+```
+data/
+├── long_video_swap/
+│   ├── swap.csv
+│   ├── swap_f16.csv
+│   ├── 10/
+│   │   ├── 0_0/
+│   │   │   ├── video.mp4
+│   │   │   ├── mask.mp4
+│   │   │   ├── video_replace.mp4
+│   │   │   ├── ref_img.png
+│   │   │   ├── 0.png
+│   │   │   ├── 80.png
+│   │   │   └── ...
+│   │   ├── 0_1/
+│   │   └── ...
+│   ├── 11/
+│   └── 5/
+│
+├── AnchorCrafter-400_405f/
+│   ├── dataset_select.csv
+│   ├── dataset_select_f16.csv
+│   ├── dataset_select_f50.csv
+│   ├── 10/
+│   │   ├── video_cut/
+│   │   ├── obj_mask_cut/
+│   │   ├── object_mask_cut_/
+│   │   │   └── <clip_id>/
+│   │   │       ├── 01.jpg
+│   │   │       ├── 02.jpg
+│   │   │       └── 03.jpg
+│   │   └── masked_object_cut_/
+│   │       └── <clip_id>/
+│   │           ├── 01.jpg
+│   │           ├── 02.jpg
+│   │           └── 03.jpg
+│   ├── 11/
+│   ├── tune/
+│   └── ...
+```
+
 ### Evaluation Models (Optional)
 
 For running evaluation metrics (FVD, FID), download additional models ([Hugging Face - GenHOI](https://huggingface.co/szlgallen/GenHOI)) to `tools/eval_fvd/`:
