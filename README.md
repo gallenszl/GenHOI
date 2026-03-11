@@ -132,6 +132,7 @@ data/
 │   ├── tune/
 │   └── ...
 ```
+
 ### Demo Files Structure
 
 After downloading, your `demo/` directory should look like:
@@ -243,6 +244,22 @@ demo/10/26_78/video.mp4,demo/10/26_78/mask.mp4,demo/10/26_78/video_replace.mp4,d
 3. **Replacement Video** (`input_path`): Video with the original object removed/replaced
 4. **Reference Image** (`ref_img`): Clear image of the target object you want to insert
 
+## 📖 Citation
+
+If you find this work useful, please consider citing:
+
+```bibtex
+@misc{huang2026genhoiobjectconsistenthandobjectinteraction,
+      title={GenHOI: Towards Object-Consistent Hand-Object Interaction with Temporally Balanced and Spatially Selective Object Injection}, 
+      author={Xuan Huang and Mochu Xiang and Zhelun Shen and Jinbo Wu and Chenming Wu and Chen Zhao and Kaisiyuan Wang and Hang Zhou and Shanshan Liu and Haocheng Feng and Wei He and Jingdong Wang},
+      year={2026},
+      eprint={2603.06048},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2603.06048}, 
+}
+```
+
 ## 🙏 Acknowledgements
 
 This project is based on the following open-source works:
@@ -253,3 +270,4 @@ This project is based on the following open-source works:
 ## 📄 License
 
 This project is released under the [Creative Commons Attribution Non Commercial 4.0](LICENSE).
+
