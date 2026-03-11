@@ -178,6 +178,7 @@ python examples/wanvideo/test_swap.py \
     --max_num_frames 81 \
     --is_fl
 ```
+
 ### Multi-GPU Inference
 
 For faster inference, use multiple GPUs:
@@ -255,6 +256,7 @@ bash tools/batch_eval_unified.sh results/selfswap_81 81 cuda
 bash tools/batch_eval_unified.sh results/swap_401 401 cuda
 bash tools/batch_eval_unified.sh results/selfswap_401 401 cuda
 ```
+
 Results are saved to `<base_dir>/all_metrics.json`.
 
 > **Note:**
@@ -339,11 +341,14 @@ GenHOI/
 If you find this work useful, please consider citing:
 
 ```bibtex
-@article{genhoi2025,
-  title={GenHOI: Generalizable Human-Object Interaction Video Generation},
-  author={},
-  journal={},
-  year={2025}
+@misc{huang2026genhoiobjectconsistenthandobjectinteraction,
+      title={GenHOI: Towards Object-Consistent Hand-Object Interaction with Temporally Balanced and Spatially Selective Object Injection}, 
+      author={Xuan Huang and Mochu Xiang and Zhelun Shen and Jinbo Wu and Chenming Wu and Chen Zhao and Kaisiyuan Wang and Hang Zhou and Shanshan Liu and Haocheng Feng and Wei He and Jingdong Wang},
+      year={2026},
+      eprint={2603.06048},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2603.06048}, 
 }
 ```
 
