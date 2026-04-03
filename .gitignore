@@ -1,5 +1,6 @@
 __pycache__
 data
+!diffsynth/data
 demo
 eval_fvd
 models/lightning_logs
