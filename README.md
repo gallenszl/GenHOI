@@ -1,4 +1,4 @@
-# GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection
+# CVPR2026 Hightlight GenHOI: Towards Object-Consistent Hand–Object Interaction with Temporally Balanced and Spatially Selective Object Injection
 
 <p align="center">
   <img src="assets/teaser.png" width="90%">
